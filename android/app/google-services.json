@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "363001950100",
+    "project_id": "homeapp-deea0",
+    "storage_bucket": "homeapp-deea0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:363001950100:android:c14591698938342c9fe981",
+        "android_client_info": {
+          "package_name": "com.homeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "363001950100-rhf55hg3jq14g50pgjqrk96j3vb5q66l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnhFEol6sY6oThwAAZdbj00Azxm1DxtSE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "363001950100-rhf55hg3jq14g50pgjqrk96j3vb5q66l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
