@@ -59,7 +59,7 @@ const Home = ({ navigation, route }) => {
             }).catch(function (error) {
                 setLoding(false);
                 if (error.response) {
-                    showToast(error.response.data + "", "error")
+                    showToast(error.response.data.detail + "", "error")
                 }
             });
 

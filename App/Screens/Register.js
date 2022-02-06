@@ -153,7 +153,7 @@ const App = ({ navigation, route }) => {
                             // title="Mobile Number"
                             keyboardType="number-pad"
                             placeholderTextColor={Colors.gray_d1}
-                            maxLength={10}
+                            // maxLength={10}
                             value={mobile}
                             selectionColor={Colors.TheamColor2}
                         />

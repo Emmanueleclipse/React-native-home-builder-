@@ -17,13 +17,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import DocumentPicker from 'react-native-document-picker';
+import Icon3 from 'react-native-vector-icons/Entypo'
 
 
 const Login = ({ navigation }) => {
     //admin
     const [isLoding, setLoding] = useState(false);
     const [loding, setloding] = useState(false);
-    const [filename, setfilename] = useState('No File Choosen');
+    const [filename, setfilename] = useState('');
     const [profileImage, setProfileImage] = useState({});
     const [pImage, setPImage] = useState("");
     const [email, setEmail] = useState('');
@@ -140,7 +141,7 @@ const Login = ({ navigation }) => {
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 // Pick multiple files
                 try {
-                    const res = await DocumentPicker.pickSingle({
+                    const res = await DocumentPicker.pickMultiple({
                         type: [DocumentPicker.types.images,
                         DocumentPicker.types.pdf,
                         DocumentPicker.types.doc,
@@ -198,9 +199,11 @@ const Login = ({ navigation }) => {
             launchImageLibrary(options, (response) => {
                 if (response.didCancel) {
                     console.log("responce didCancel");
-                } else if (response.error) {
+                }
+                 else if (response.error) {
                     console.log("responce error");
-                } else {
+                } 
+                else {
                     const source = response.uri;
                     console.log("response.type", response.type);
                     console.log(response);
@@ -311,10 +314,19 @@ const Login = ({ navigation }) => {
 
 
                             <Text style={[Style.text14, { fontFamily: CustomeFonts.Poppins_Bold, marginTop: 15, marginBottom: 6, color: Colors.lightblack, }]}>Attachment</Text>
-                            <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
+                            {/* <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
                                 <TouchableOpacity onPress={() => selectImage()}><Text style={[Style.text16, { borderWidth: 1, borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Choose File</Text>
                                 </TouchableOpacity><Text style={[Style.text14, { textAlignVertical: 'center', flex: 7, marginLeft: 6 }]}>{filename}</Text>
-                            </View>
+                            </View> */}
+
+                    <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
+                        <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={() => CapturePhoto()}>
+                                <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload File</Text>
+                                <Icon3 name="attachment" color={Colors.black} size={18} />
+                            </TouchableOpacity>
+                        </View>
+                      <Text style={[Style.text14, { textAlignVertical: 'center', flex: 7, marginLeft: 6 }]}>{filename}</Text>
+
 
                             <View style={[Style.buttonStyle2, { width: '50%', marginTop: 20, }]}>
                                 {loding ?
@@ -326,8 +338,7 @@ const Login = ({ navigation }) => {
                                         onPress={() => {
                                             validationCheck()
 
-                                        }}
-                                    >
+                                        }}>
                                         <Text style={[Style.text16, { lineHeight: 20, textAlign: 'center', width: '100%', color: Colors.white }]}>SEND</Text>
                                     </TouchableOpacity>
                                 }

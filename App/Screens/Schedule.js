@@ -61,7 +61,7 @@ const Home = ({ navigation, route }) => {
             }).catch(function (error) {
                 setLoding(false);
                 if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
+                    showToast(JSON.stringify(error.response.data.detail) + "", "error")
                 }
             });
 

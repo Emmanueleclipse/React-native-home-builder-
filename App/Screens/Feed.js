@@ -135,7 +135,7 @@ const Home = ({ navigation, route }) => {
             }).catch(function (error) {
                 setLoding(false);
                 if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
+                    showToast(error.response.data.detail + "", "error")
                 }
             });
 
@@ -162,7 +162,7 @@ const Home = ({ navigation, route }) => {
                         <TouchableOpacity
                             onPress={() => {
 
-                                navigation.navigate('More')
+                                navigation.navigate('CreateProperty1')
 
                             }}
                             style={{ height: 40, marginTop:40, marginLeft:20,  margin: 3, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, borderRadius: 4, backgroundColor: Colors.TheamColor3 }}>
