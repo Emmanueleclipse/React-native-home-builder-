@@ -36,14 +36,9 @@ const App = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [infoclick, setinfoclick] = useState(false);
     const [filename, setfilename] = useState('');
-    const [profileImage, setProfileImage] = useState({});
-    const [pImage, setPImage] = useState("");
+    const [pImage, setPImage] = useState([]);
     const [inviteSuccessModal, setInviteSuccessModal] = useState(false);
     const [selected, setSelected] = useState([])
-
-    useEffect(() => {
-
-    }, [])
 
     const validationCheck = () => {
         if (
@@ -52,8 +47,6 @@ const App = ({ navigation }) => {
             validationBlank(city, "Enter City") &&
             validationBlank(statedata, "Enter State") &&
             validationBlank(zipcode, "Enter Zipcode")
-            // validationBlank(pImage, "Select Photo")
-
         ) {
             apiCall()
         }
@@ -63,35 +56,33 @@ const App = ({ navigation }) => {
         var access = await AsyncStorage.getItem('access')
         setLoding(true);
 
-
-        var formdata = new FormData();
+        const formdata = new FormData();
+        
         formdata.append('name', name);
         formdata.append('address', address);
         formdata.append('city', city);
         formdata.append('state', statedata);
         formdata.append('zip_code', zipcode);
-        if (validationempty(pImage)) {
-            formdata.append('image', '');
+        if(pImage){
+            pImage.map(file => (
+                formdata.append('attachments', file)
+            ))
+        } else {
+            formdata.append('attachments', '')
         }
-        else {
-            formdata.append('image', pImage);
-        }
-
         const headers = {
             'Authorization': 'Bearer ' + access,
-            "content-type": "application/json"
+            "Content-type": false,
         };
-        console.log("======formdata", formdata)
-        Axios.post(Urls.baseUrl + 'api/property/', formdata, { headers })
+        
+        Axios.post(Urls.baseUrl + 'api/property/', formdata, { headers: headers })
             .then(response => {
-                console.log("======", response)
                 setLoding(false);
                 if (validationempty(response.data)) {
                     console.log("======pk", response.data.pk)
                     showToast('Added Successfully', "success");
                     property_id = response.data.pk + "";
                     setinfoclick(true)
-                    // navigation.goBack();
                 }
             }).catch(function (error) {
                 setLoding(false);
@@ -106,9 +97,7 @@ const App = ({ navigation }) => {
 
     const apiCall_Invite = async () => {
 
-        if (validationBlank(email, "Enter Email")
-        ) {
-
+        if (validationBlank(email, "Enter Email")) {
             var access = await AsyncStorage.getItem('access')
             isetLoding(true);
 
@@ -123,8 +112,6 @@ const App = ({ navigation }) => {
                 invitation_type:'homeowner'
             });
 
-            console.log(access);
-            console.log(params);
             Axios.post(Urls.baseUrl + 'api/invite-send/', params, { headers })
                 .then(response => {
                     console.log("======", response)
@@ -149,18 +136,6 @@ const App = ({ navigation }) => {
     }
 
     const capturePhoto = async () => {
-        console.log("click on image ");
-        const options = {
-            title: "Select Image",
-            takePhotoButtonTitle: "Take Photo",
-            chooseFromLibraryButtonTitle: "Choose From Gallery",
-            quality: 1,
-            maxWidth: 500,
-            maxHeight: 500,
-            noData: true,
-            saveToPhotos: false,
-        };
-
         const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.CAMERA,
             {
@@ -172,14 +147,14 @@ const App = ({ navigation }) => {
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-           
-            DocumentPicker.pick({
+            DocumentPicker.pickMultiple({
                 type: types.allFiles 
             })
                 .then(DocumentPickerOptions => {
                     setfilename(DocumentPickerOptions[0].name)
-                    setPImage(DocumentPickerOptions[0].uri)
-                    console.log("Picked", pImage, filename)
+                    setPImage(DocumentPickerOptions)
+                    setSelected([...selected,DocumentPickerOptions[0].name])
+                    console.log('picker', DocumentPickerOptions)
                 })
                 .catch(err => console.log("Error", err))
         } else {
@@ -187,8 +162,8 @@ const App = ({ navigation }) => {
         }
     };
 
-    const selectedFiles =  selected.map((image, i) => (
-        <SelectedFile key={i} fileName={image} onPress={() => setfilename('')}/>
+    const selectedFiles =  pImage.map((image, i) => (
+        <SelectedFile key={i} fileName={image.name} onPress={() => setfilename('')}/>
     ))
 
     return (

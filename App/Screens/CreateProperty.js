@@ -140,7 +140,7 @@ const App = ({ navigation }) => {
 
             const headers = {
                 'Authorization': 'Bearer ' + access,
-                "content-type": "application/json"
+                "content-type": false
             };
 
             var formdata = new FormData();
@@ -149,15 +149,11 @@ const App = ({ navigation }) => {
             formdata.append('description', password);
             formdata.append('_from', date);
             formdata.append('_to', todate);
-            // formdata.append('attachment', profileImage);
             let selectedFileArray = []
             pickerData.map((item, index) => {
                 selectedFileArray.push({ uri: item.uri, name: item.name, type: item.type })
             })
-            console.log('dd ',selectedFileArray)
-            // if (validationempty(pImage)) {
-            //     formdata.append('attachment', profileImage);
-            // }
+    
             if (selectedFileArray.length !== 0) {
                 formdata.append('attachment', selectedFileArray[0]);
             }
@@ -165,8 +161,6 @@ const App = ({ navigation }) => {
                 formdata.append('attachment', '');
             }
 
-            console.log(access);
-            console.log('formdata ::: ', formdata);
             Axios.post(Urls.baseUrl + 'api/activity/', formdata, { headers })
                 .then(response => {
                     console.log("======ww", response)
