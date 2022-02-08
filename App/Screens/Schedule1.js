@@ -35,14 +35,27 @@ const Home = ({ navigation, route }) => {
     const [showimage, setshowImage] = useState(false);
     const [showpdf, setshowpdf] = useState(false);
     const [zoomImage, setzoomImage] = useState(false);
+    const [mimeType, setMimeType] = useState([])
 
+    useEffect(() => {
+        loadFiles()
+    },[])
 
-    // useEffect(() => {
-        
-    //     // apiCall_proprtylist()
-    // }, [isFocused]);
+    const loadFiles = () => {
+        item.attachments.map(item => setMimeType(item.type))
+    }
 
+    const images = item.attachments.map(item => item).filter(item => {
+        let file = item.type
+        return  file != 'pdf' && file != 'doc' && file != 'csv'
+    })
 
+    const otherFiles = item.attachments.map(item => item).filter(item => {
+        let file = item.type
+        return file != 'jpg' && file != 'jpeg' & file != 'png' 
+    })
+
+    // console.log("images", images)
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
         // console.log("======access", access)
@@ -82,8 +95,7 @@ const Home = ({ navigation, route }) => {
             }
         });
     };
-
-    console.log('Attachments', item.activities[0])
+    
     return (
         <SafeAreaView style={Style.cointainer}>
 
@@ -120,24 +132,28 @@ const Home = ({ navigation, route }) => {
                     {
                         showimage ?
 
-                            item.activities[0].attachment !== null && !(item.activities[0].attachment.includes('.doc') && !item.activities[0].attachment.includes('.csv') && !item.activities[0].attachment.includes('.pdf')) ?
+                            images !== null  ?
 
-                                <TouchableOpacity style={{
-                                    width: '100%', height: 150,
-                                }} onPress={() =>
-                                    setzoomImage(true)} >
-
-                                    <Image
-                                        resizeMode='cover'
-                                        style={{
-                                            justifyContent: 'center', alignSelf: 'center', marginBottom: 4,
-                                            height: '100%', width: '100%'
-                                        }}
-                                        source={{ uri: Urls.imageUrl + item.activities[0].attachment }} />
-                                </TouchableOpacity>
+                                <FlatList
+                                    data={images}
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item }) =>  (
+                                        <TouchableOpacity style={styles.list} onPress={() =>
+                                            setzoomImage(true)} >
+                                            <Image
+                                                resizeMode='center'
+                                                style={{
+                                                     marginBottom: 4,
+                                                    height: '100%', width: '100%'
+                                                }}
+                                                source={{ uri: Urls.imageUrl + item.attachment }} />
+                                        </TouchableOpacity>
+                                    )}
+        
+                                />
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center', marginVertical: 10 }]}>Data Not Found</Text>
-
                             :
                             null
 
@@ -148,36 +164,17 @@ const Home = ({ navigation, route }) => {
                     </TouchableOpacity>
                     {
                         showpdf ?
-                            item.activities[0].attachment !== null && (item.activities[0].attachment.includes('.doc') || item.activities[0].attachment.includes('.csv') || item.activities[0].attachment.includes('.pdf')) ?
-                                <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.activities[0].attachment)} >
-                                    <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{item.activities[0].attachment}</Text>
+                            otherFiles !== null  ?
+                                <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments[0]?.attachments)} >
+                                    { otherFiles.map(file => (
+                                        <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{file.attachment}</Text> 
+                                    ))}
                                 </TouchableOpacity>
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center' }]}>Data Not Found</Text>
                             : null
                     }
                 </View>
-
-                // <FlatList
-                //     showsVerticalScrollIndicator={false}
-                //     data={userArray}
-                //     renderItem={({ item, index }) => (
-                //         <TouchableOpacity
-                //             style={{ marginTop: 5, paddingHorizontal: 5, }}>
-                //             <View style={{ flexDirection: 'row', paddingVertical: 6 }}>
-
-                //                 <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center', flexDirection: 'column', paddingHorizontal: 8 }}>
-                //                     <Text style={[Style.text16, { flex: 2, fontFamily: CustomeFonts.Poppins_SemiBold }]}>{item.milestone_name}</Text>
-                //                     <Text style={[Style.text12, { flex: 2, marginTop: 4 }]}>{item.description}</Text>
-                //                     <Text style={[Style.text12, { flex: 2, marginTop: 4 }]}>{item._from} TO {item._to}</Text>
-                //                 </View>
-                //             </View>
-                //             <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View>
-                //         </TouchableOpacity>
-                //     )}
-                //     keyExtractor={(item, index) => index.toString()}
-                //     ListEmptyComponent={<NoData />}
-                // />
 
             }
             {
@@ -208,6 +205,13 @@ const Home = ({ navigation, route }) => {
     );
 };
 
+const { width } = Dimensions.get('screen')
+const styles = StyleSheet.create({
+    list : {
+        width: width ,
+        height: 200
+    }
+})
 
 
 export default Home;
