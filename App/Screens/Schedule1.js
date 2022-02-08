@@ -37,14 +37,15 @@ const Home = ({ navigation, route }) => {
     const [zoomImage, setzoomImage] = useState(false);
 
 
-    useEffect(() => {
-        console.log(item);
-        // apiCall_proprtylist()
-    }, [isFocused]);
+    // useEffect(() => {
+        
+    //     // apiCall_proprtylist()
+    // }, [isFocused]);
+
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
-        console.log("======access", access)
+        // console.log("======access", access)
         setLoding(true);
 
         const headers = {
@@ -61,7 +62,7 @@ const Home = ({ navigation, route }) => {
                 console.log("======response.data", response.data)
                 if (response.data != null) {
                     setuserArray(response.data)
-                    console.log("======response", userArray)
+                    // console.log("======response", userArray)
                 }
 
             }).catch(function (error) {
@@ -72,17 +73,17 @@ const Home = ({ navigation, route }) => {
             });
 
     };
-    console.log('.. ', item)
     const handleClick = (url) => {
         Linking.canOpenURL(url).then(supported => {
             if (supported) {
                 Linking.openURL(url);
             } else {
-                console.log("Don't know how to open URI: " + this.props.url);
+                // console.log("Don't know how to open URI: " + this.props.url);
             }
         });
     };
 
+    console.log('Attachments', item.activities[0])
     return (
         <SafeAreaView style={Style.cointainer}>
 
@@ -93,11 +94,11 @@ const Home = ({ navigation, route }) => {
                     <Indicator></Indicator>
                 </View>
                 :
-                <View
+                <View 
                     style={{ marginTop: 5, padding: 15, borderRadius: 10, margin: 5, elevation: 5, backgroundColor: 'white' }}>
                     <Text style={[Style.text16, { fontFamily: CustomeFonts.Poppins_Bold, color: Colors.TheamColor3 }]}>{item.name + ""}</Text>
                     <View style={{ flexDirection: 'row' }} >
-                        <Text style={[Style.text14, { marginTop: 10, flex: 1, }]}>{item.address} , {item.state}</Text>
+                        <Text onPress={handleClick} style={[Style.text14, { marginTop: 10, flex: 1, }]}>{item.address} , {item.state}</Text>
                         <Text style={[Style.text12, { marginTop: 10 }]}>{item.activities[0]._from} - {item.activities[0]._to}</Text>
 
 
