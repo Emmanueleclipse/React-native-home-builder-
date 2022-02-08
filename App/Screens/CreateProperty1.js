@@ -19,6 +19,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import DocumentPicker, { types, DocumentPickerOptions } from 'react-native-document-picker'
+import SelectedFile from '../Compoment/SelectedFile';
+
 
 var property_id;
 const App = ({ navigation }) => {
@@ -36,6 +39,7 @@ const App = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState({});
     const [pImage, setPImage] = useState("");
     const [inviteSuccessModal, setInviteSuccessModal] = useState(false);
+    const [selected, setSelected] = useState([])
 
     useEffect(() => {
 
@@ -67,10 +71,10 @@ const App = ({ navigation }) => {
         formdata.append('state', statedata);
         formdata.append('zip_code', zipcode);
         if (validationempty(pImage)) {
-            formdata.append('image', profileImage);
+            formdata.append('image', '');
         }
         else {
-            formdata.append('image', '');
+            formdata.append('image', pImage);
         }
 
         const headers = {
@@ -144,7 +148,7 @@ const App = ({ navigation }) => {
 
     }
 
-    const CapturePhoto = async () => {
+    const capturePhoto = async () => {
         console.log("click on image ");
         const options = {
             title: "Select Image",
@@ -168,30 +172,24 @@ const App = ({ navigation }) => {
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log("You can use the camera");
-            launchImageLibrary(options, (response) => {
-                if (response.didCancel) {
-                    console.log("responce didCancel");
-                } else if (response.error) {
-                    console.log("responce error");
-                } else {
-                    const source = response.uri;
-                    console.log("response.type", response.type);
-                    console.log(response);
-                    setPImage(source);
-                    setProfileImage({
-                        uri: response.uri,
-                        name: response.fileName,
-                        type: response.type,
-                    });
-                    setfilename(response.fileName);
-                }
-            });
+           
+            DocumentPicker.pick({
+                type: types.allFiles 
+            })
+                .then(DocumentPickerOptions => {
+                    setfilename(DocumentPickerOptions[0].name)
+                    setPImage(DocumentPickerOptions[0].uri)
+                    console.log("Picked", pImage, filename)
+                })
+                .catch(err => console.log("Error", err))
         } else {
             console.log("Camera permission denied");
         }
     };
 
+    const selectedFiles =  selected.map((image, i) => (
+        <SelectedFile key={i} fileName={image} onPress={() => setfilename('')}/>
+    ))
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
@@ -259,22 +257,26 @@ const App = ({ navigation }) => {
                         />
                         <Text style={[Style.text14, { fontFamily: CustomeFonts.Poppins_Bold, marginTop: 15, marginBottom: 6, color: Colors.lightblack, }]}>Select Photo</Text>
                         <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
-                        <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={() => CapturePhoto()}>
+                        <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={capturePhoto}>
                                 <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload File</Text>
                                 <Icon3 name="attachment" color={Colors.black} size={18} />
                             </TouchableOpacity>
                         </View>
                         {
-                            filename !== "" ?
-                                <View style={{ flexDirection: "row", backgroundColor: Colors.TheamColor, elevation: 5, padding: 10, borderRadius: 10, flex: 1, alignItems: 'center' }} >
-                                    <Text style={[Style.text14, { textAlignVertical: 'center', flex: 1, marginHorizontal: 6 }]}>{filename}</Text>
-                                    <TouchableOpacity onPress={() => setfilename('')} >
-                                        <Icon2 name="delete" color={'red'} size={18} />
-                                    </TouchableOpacity>
-                                </View>
-                                : null
+                            selected && selectedFiles
                         }
+                        
+                        {/* { 
+                        filename ?  (
+                        <View style={{ flexDirection: "row", backgroundColor: Colors.TheamColor, elevation: 5, padding: 10, borderRadius: 10, flex: 1, alignItems: 'center', marginBottom: 5 }} >
+                            <Text style={[Style.text14, { textAlignVertical: 'center', flex: 1, marginHorizontal: 6 }]}>{filename}</Text>
+                            <TouchableOpacity onPress={() => setfilename('')} >
+                                <Icon2 name="delete" color={'red'} size={18} />
+                            </TouchableOpacity>
+                        </View>
 
+                        ) : null 
+                        } */}
 
 
                     </View>
