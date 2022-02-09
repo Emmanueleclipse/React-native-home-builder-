@@ -44,21 +44,19 @@ const Home = ({ navigation, route }) => {
     const loadFiles = () => {
         item.attachments.map(item => setMimeType(item.type))
     }
-
-    const images = item.attachments.map(item => item).filter(item => {
+// console.log('activi', item.activities)
+    const images = item.activities.map(item => item).filter(item => {
         let file = item.type
         return  file != 'pdf' && file != 'doc' && file != 'csv'
     })
 
-    const otherFiles = item.attachments.map(item => item).filter(item => {
+    const otherFiles = item.activities.map(item => item).filter(item => {
         let file = item.type
         return file != 'jpg' && file != 'jpeg' & file != 'png' 
     })
 
-    // console.log("images", images)
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
-        // console.log("======access", access)
         setLoding(true);
 
         const headers = {
@@ -72,7 +70,6 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======response.data", response.data)
                 if (response.data != null) {
                     setuserArray(response.data)
                     // console.log("======response", userArray)
@@ -143,11 +140,9 @@ const Home = ({ navigation, route }) => {
                                             setzoomImage(true)} >
                                             <Image
                                                 resizeMode='center'
-                                                style={{
-                                                     marginBottom: 4,
-                                                    height: '100%', width: '100%'
-                                                }}
-                                                source={{ uri: Urls.imageUrl + item.attachment }} />
+                                                style={{ marginBottom: 4, height: '100%', width: '100%' }}
+                                                source={{ uri: Urls.imageUrl + item.attachment }} 
+                                                />
                                         </TouchableOpacity>
                                     )}
         
@@ -164,7 +159,7 @@ const Home = ({ navigation, route }) => {
                     </TouchableOpacity>
                     {
                         showpdf ?
-                            otherFiles !== null  ?
+                            otherFiles.length > 0  ?
                                 <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments[0]?.attachments)} >
                                     { otherFiles.map(file => (
                                         <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{file.attachment}</Text> 
