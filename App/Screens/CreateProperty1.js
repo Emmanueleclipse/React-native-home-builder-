@@ -112,7 +112,6 @@ const App = ({ navigation }) => {
 
             Axios.post(Urls.baseUrl + 'api/invite-send/', params, { headers })
                 .then(response => {
-                    console.log("======", response)
                     isetLoding(false);
                     if (validationempty(response.data)) {
                         // showToast('Invitation sent successfully !', "success");
@@ -135,7 +134,7 @@ const App = ({ navigation }) => {
 
     const captureFile = async () => {
         DocumentPicker.pickSingle({
-            type: types.allFiles 
+            type: types.images 
         })
             .then(DocumentPickerOptions => {
                 setfilename(DocumentPickerOptions.name)
