@@ -49,11 +49,9 @@ const Home = ({ navigation, route }) => {
             'Authorization': 'Bearer ' + access,
             "content-type": "application/json"
         };
-        console.log("======messages", Urls.baseUrl + 'api/messages/')
         Axios.get(Urls.baseUrl + 'api/messages/', { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======messages", response.data)
                 if (response.data != null) { setuserArray(response.data) }
 
             }).catch(function (error) {

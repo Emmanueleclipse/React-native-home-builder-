@@ -55,7 +55,6 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======response.data", JSON.stringify(response.data))
                 if (response.data != null) { setuserArray(response.data) }
 
             }).catch(function (error) {

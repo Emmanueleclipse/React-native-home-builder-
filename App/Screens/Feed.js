@@ -63,7 +63,6 @@ const Home = ({ navigation, route }) => {
             "device_type": Platform.OS + '',
 
         });
-        console.log("======", params);
         Axios.post(Urls.baseUrl + Urls.notificationa, params,
             { headers })
             .then(async function (response) {
@@ -73,8 +72,6 @@ const Home = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        console.log(JSON.stringify(userArray))
-        // showToast("Hello","success")
         getToken()
         setlinkname('')
         apiCall_proprtylist()
@@ -103,27 +100,12 @@ const Home = ({ navigation, route }) => {
                             var myDate = new Date(item.activities[0]._from);
                             item.activities[0]._from = myDate.getTime();
                             data.push(item)
-
                         }
-
                     })
-
                     data.sort(function (a, b) {
                         return a.activities[0]._from - b.activities[0]._from
                     })
                     setuserArray(data)
-
-                    // var diffdate = new Date(response.data.activities[0]._from);
-                    // var myDate = response.data.activities[0]._from;
-                    // myDate = myDate.split("-");
-                    // var newDate = new Date( myDate[0], myDate[1] - 1, myDate[2]);
-                    // console.log('ssssssssssssssssss', JSON.stringify(response.data))
-                    //   const datee = response.data.activities[0]._from.sort(function (a, b) {
-                    //         var distancea = Math.abs(diffdate - new Date(a));
-                    //         var distanceb = Math.abs(diffdate - new Date(b));
-                    //         return distancea - distanceb; // sort a before b when the distance is smaller
-                    //     });
-
                 }
 
             }).catch(function (error) {
@@ -147,17 +129,10 @@ const Home = ({ navigation, route }) => {
             ) : (
                 userArray.length === 0 && LocalData.FLAG !== '1' ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: "center" }} >
-                          {/* <NoData itemtext="No activity"/>   */}
-                          {/* <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, marginVertical: '20%' }}> */}
-            <Image source={Images.nodata} style={{ height: 120, width: 250 }} resizeMode='contain' />
-            <Text style={[Style.text12, { width: '100%', textAlign: "center" }]}>No activity</Text>
-        {/* </View> */}
+                        <Image source={Images.nodata} style={{ height: 120, width: 250 }} resizeMode='contain' />
+                        <Text style={[Style.text12, { width: '100%', textAlign: "center" }]}>No activity</Text>
                         <TouchableOpacity
-                            onPress={() => {
-
-                                navigation.navigate('CreateProperty1')
-
-                            }}
+                            onPress={() => navigation.navigate('CreateProperty1')}
                             style={{ height: 40, marginTop:40, marginLeft:20,  margin: 3, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, borderRadius: 4, backgroundColor: Colors.TheamColor3 }}>
                             <Text style={[Style.text14, { textAlignVertical: 'center', textAlign: 'center', color: Colors.white }]}>Get started</Text>
                         </TouchableOpacity>

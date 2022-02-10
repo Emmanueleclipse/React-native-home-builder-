@@ -63,7 +63,6 @@ const Login = ({ navigation,route }) => {
         console.log(formdata);
         Axios.post(Urls.baseUrl + 'api/messages/', formdata, { headers })
             .then(response => {
-                console.log("======", response)
                 setloding(false);
                 if (validationempty(response.data)) {
                     showToast('Added Successfully', "success");
@@ -138,7 +137,6 @@ const Login = ({ navigation,route }) => {
     }
 
     const CapturePhoto = async () => {
-        console.log("click on image ");
         const options = {
             title: "Select Image",
             takePhotoButtonTitle: "Take Photo",
@@ -161,7 +159,6 @@ const Login = ({ navigation,route }) => {
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log("You can use the camera");
             launchImageLibrary(options, (response) => {
                 if (response.didCancel) {
                     console.log("responce didCancel");
@@ -191,7 +188,6 @@ const Login = ({ navigation,route }) => {
         return (<Picker.Item key={item.pk} label={item.name} value={item.pk} />)
     })
     const {message}=route.params
-    console.log(message)
     return (
         <SafeAreaView style={{ flex: 1 }}>
 

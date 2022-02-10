@@ -45,15 +45,14 @@ const Home = ({ navigation, route }) => {
         item.attachments.map(item => setMimeType(item.type))
     }
     let data = []
-    const imagesUploaded = item.activities.map(item => item.attachments)
     const Uploaded = item.activities.map(item => item.attachments.map(item => {
        return data.push({ type: item.type, attachment: item.attachment})
     }))
+    
     const images = data.map(item => item).filter(item => {
         let file = item.type
         return  file !== 'pdf' && file !== 'doc' && file !== 'csv'
     })
-    console.log('images', images)
 
     const otherFiles = data.map(item => item).filter(item => {
         let file = item.type
@@ -77,7 +76,6 @@ const Home = ({ navigation, route }) => {
                 setLoding(false);
                 if (response.data != null) {
                     setuserArray(response.data)
-                    // console.log("======response", userArray)
                 }
 
             }).catch(function (error) {
@@ -167,7 +165,6 @@ const Home = ({ navigation, route }) => {
                             otherFiles.length > 0  ?
                                 <FlatList
                                     data={otherFiles}
-                                    style={{ height: 150}}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments)} >                 
                                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10}}>

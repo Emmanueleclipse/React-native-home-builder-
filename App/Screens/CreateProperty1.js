@@ -77,7 +77,6 @@ const App = ({ navigation }) => {
             .then(response => {
                 setLoding(false);
                 if (validationempty(response.data)) {
-                    console.log("======pk", response.data.pk)
                     showToast('Added Successfully', "success");
                     property_id = response.data.pk + "";
                     setinfoclick(true)
