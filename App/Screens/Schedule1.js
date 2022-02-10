@@ -44,13 +44,18 @@ const Home = ({ navigation, route }) => {
     const loadFiles = () => {
         item.attachments.map(item => setMimeType(item.type))
     }
-// console.log('activi', item.activities)
-    const images = item.activities.map(item => item).filter(item => {
+    let data = []
+    const imagesUploaded = item.activities.map(item => item.attachments)
+    const Uploaded = item.activities.map(item => item.attachments.map(item => {
+       return data.push({ type: item.type, attachment: item.attachment})
+    }))
+    const images = data.map(item => item).filter(item => {
         let file = item.type
-        return  file != 'pdf' && file != 'doc' && file != 'csv'
+        return  file !== 'pdf' && file !== 'doc' && file !== 'csv'
     })
+    console.log('images', images)
 
-    const otherFiles = item.activities.map(item => item).filter(item => {
+    const otherFiles = data.map(item => item).filter(item => {
         let file = item.type
         return file != 'jpg' && file != 'jpeg' & file != 'png' 
     })
@@ -160,11 +165,22 @@ const Home = ({ navigation, route }) => {
                     {
                         showpdf ?
                             otherFiles.length > 0  ?
-                                <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments[0]?.attachments)} >
-                                    { otherFiles.map(file => (
-                                        <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{file.attachment}</Text> 
-                                    ))}
-                                </TouchableOpacity>
+                                <FlatList
+                                    data={otherFiles}
+                                    style={{ height: 150}}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments)} >                 
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10}}>
+                                                <Image
+                                                    resizeMode='contain'
+                                                    style={{ width: 20, height: 20, marginRight: 10}}
+                                                    source={item.type === 'pdf' && require('../assets/images/pdf.png') || item.type === 'csv' && require('../assets/images/csv.png' || item.type == 'doc' && require('../assets/images/doc.png' ))}
+                                                />
+                                                <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{item.attachment}</Text> 
+                                            </View>
+                                        </TouchableOpacity>
+                                    )}
+                                />
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center' }]}>Data Not Found</Text>
                             : null
