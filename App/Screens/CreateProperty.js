@@ -135,19 +135,16 @@ const App = ({ navigation }) => {
 
     const pickerDocument = async () => {
         DocumentPicker.pickMultiple({ type: types.allFiles })
-        .then(DocumentPickerOptions => {
-            let files = {}
+        .then(DocumentPickerOptions => {  
             DocumentPickerOptions.map(file => (
                 pImage.push(file)
             ))
             setPImage([...pImage])
             setSelected(DocumentPickerOptions[0].name)
-            console.log('Picker', DocumentPickerOptions)
         })
         .catch(err => console.log(err))
     };
     
-    console.log('Pimage', pImage)
     const clearSelection = item => {
         let currentFiles = pImage.filter(file => file.name !== item)
         setPImage([...currentFiles])

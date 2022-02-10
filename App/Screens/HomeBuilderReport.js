@@ -45,7 +45,6 @@ const Home = ({ navigation, route }) => {
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
-        console.log("======access", access)
         setLoding(true);
 
         const headers = {
@@ -56,7 +55,6 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
-                console.log("ractivitieses", response.data);
                 if (response.data != null) { setuserArray(response.data) }
 
             }).catch(function (error) {
@@ -82,10 +80,9 @@ const Home = ({ navigation, route }) => {
         }
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
-                console.log("res", response);
                 setLoding(false);
                 showToast(response.data.detail + "", "info")
-                navigation.goBack();
+                // navigation.goBack();
             }).catch(function (error) {
                 setLoding(false);
                 if (error.response) {
@@ -107,10 +104,8 @@ const Home = ({ navigation, route }) => {
         if (validationempty(pk)) {
             url = 'api/activity/' + pk
         }
-        console.log("url", url);
         Axios.delete(Urls.baseUrl + url, { headers })
             .then(response => {
-                console.log("=========", response);
                 setLoding(false);
                 navigation.goBack();
             }).catch(function (error) {
@@ -156,9 +151,6 @@ const Home = ({ navigation, route }) => {
                                     }}>
                                     <View style={{ flexDirection: 'row' }} >
                                         <Text style={[Style.text14, { flex: 1 }]}>{(index + 1)}.  {item.milestone_name}</Text>
-                                        {/* <Text style={[Style.text14, { backgroundColor: Colors.gray_d1, color: Colors.black, borderRadius: 8, justifyContent: 'center', alignItems: "center", textAlign: "center", paddingHorizontal: 10, paddingTop: 6, paddingBottom: 3, }]}>Edit</Text> */}
-
-
                                     </View>
 
                                     {item.status == 'approved' ?
@@ -226,43 +218,11 @@ const Home = ({ navigation, route }) => {
                                             }
 
                                         </View>
-                                        {/* } */}
-                                        {/* <View style={[Style.buttonStyle2, { flex: 1, marginRight: 8, backgroundColor: Colors.white, borderColor: '#CD1A1D', borderWidth: 2, }]}>
-                                    <TouchableOpacity
-                                        style={{ width: '100%' }}
-                                        onPress={() => {
-                                            Alert.alert(
-                                                "Delete",
-                                                `Are you sure you want to Delete ?`,
-                                                [
-                                                    {
-                                                        text: "Cancel",
-                                                        onPress: () => console.log("Cancel Pressed"),
-                                                        style: "cancel"
-                                                    },
-                                                    {
-                                                        text: "OK", onPress: () => {
-                                                            apiCall_delete(item.pk + "")
-                                                        }
-                                                    }
-                                                ],
-                                                { cancelable: true }
-                                            );
-
-                                        }}
-                                    >
-                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.lightblack }]}>Delete</Text>
-                                    </TouchableOpacity>
-
-                                </View> */}
-
                                     </View>
-
                                 </View>
                             )}
 
                             keyExtractor={(item, index) => index.toString()}
-                        // ListEmptyComponent={<NoData />}
                         />
 
 
