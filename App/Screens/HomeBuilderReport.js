@@ -3,33 +3,26 @@ import {
     SafeAreaView,
     Text,
     View,
-    Image,
-    FlatList, Platform,
+    FlatList,
     TouchableOpacity,
-    StyleSheet, Alert,
-    Dimensions,
+    Alert,
 } from 'react-native';
 import Colors from '../Theme/Colors';
-import CustomeFonts from '../Theme/CustomeFonts';
-import Style, { HEIGHT } from '../Theme/Style';
+import Style from '../Theme/Style';
 import { Icon } from 'react-native-elements';
-import {
-    validatePhone, validateEmail, validateName, matchPassword,
-    validationempty, validationBlank, validatePassword
-} from '../Common/Validations';
-import { LocalData, Params, Urls } from '../Common/Urls';
+import { validationempty } from '../Common/Validations';
+import { Urls } from '../Common/Urls';
 import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
 import { useIsFocused } from '@react-navigation/native'
 import Moment from 'moment';
+import Card from '../Compoment/Card';
 
 const Home = ({ navigation, route }) => {
 
     const { pr_id, item, index, milestoneArray } = route.params;
     const [isLoding, setLoding] = useState(false);
-    const [loding, setLoding1] = useState(false);
-    const [loding1, setLoding11] = useState(false);
     const [userArray, setuserArray] = useState()
     const isFocused = useIsFocused()
 
@@ -82,7 +75,6 @@ const Home = ({ navigation, route }) => {
             .then(response => {
                 setLoding(false);
                 showToast(response.data.detail + "", "info")
-                // navigation.goBack();
             }).catch(function (error) {
                 setLoding(false);
                 if (error.response) {
@@ -116,6 +108,29 @@ const Home = ({ navigation, route }) => {
             });
         };
 
+        const showAlert = item => {
+            Alert.alert(
+                "Submit",
+                `Are you sure you want to Submit ?`,
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                    },
+                    {
+                        text: "OK", onPress: () => {
+                            if(item.status === 'Awaiting feedback'){
+                                return showToast("Awaiting feedback", "error")
+                            } else {
+                            apiCall_approve(item.pk + "")
+                            }
+                        }
+                    }
+                ],
+                { cancelable: true }
+            );
+        }
 
     return (
         <SafeAreaView style={Style.cointainer}>
@@ -130,12 +145,9 @@ const Home = ({ navigation, route }) => {
                     <View style={[{ width: '50%', marginTop: 20, justifyContent: 'center', alignSelf: 'center' }]}>
                         <TouchableOpacity
                             style={{ width: '100%', alignItems: "center" }}
-                            onPress={() => {
-                                navigation.navigate('MessagesProperty', { pr_id: pr_id })
-                            }}
+                            onPress={() => navigation.navigate('MessagesProperty', { pr_id: pr_id })}
                         >
                             <Icon name={'message-bulleted'} type={'material-community'} color={Colors.TheamColor2} size={35} style={{ width: 40, justifyContent: 'flex-start' }} />
-
                             <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.TheamColor3 }]}>Messages</Text>
                         </TouchableOpacity>
                     </View>
@@ -144,88 +156,29 @@ const Home = ({ navigation, route }) => {
                             showsVerticalScrollIndicator={false}
                             data={milestoneArray}
                             renderItem={({ item, index }) => (
-                                <View
-                                    style={{
-                                        flex: 1, borderBottomWidth: 1, borderColor: Colors.divider,
-                                        flexDirection: 'column', paddingVertical: 10, marginTop: 20, backgroundColor: Colors.TheamColor, elevation: 5, margin: 5, paddingVertical: 15, padding: 10, borderRadius: 10
-                                    }}>
-                                    <View style={{ flexDirection: 'row' }} >
-                                        <Text style={[Style.text14, { flex: 1 }]}>{(index + 1)}.  {item.milestone_name}</Text>
-                                    </View>
-
-                                    {item.status == 'approved' ?
-                                        <View style={{ flexDirection: 'row', }}>
-                                            <Text style={[Style.text14, {
-                                                flexShrink: 1, padding: 4, borderColor: Colors.gray_d1, borderWidth: 1, borderRadius: 8, color: Colors.TheamColor4, marginTop: 8
-                                            }]}>{item.status}</Text>
-                                        </View>
-                                        :
-                                        <View style={{ flexDirection: 'row', }}>
-                                            <Text style={[Style.text14, {
-                                                flexShrink: 1, padding: 4, borderColor: Colors.gray_d1, borderWidth: 1, borderRadius: 8, color: '#FB0015', marginTop: 8
-                                            }]}>{item.status}</Text>
-
-                                        </View>
-                                    }
-
-
-                                    <Text style={[Style.text14, { marginTop: 8 }]}>Due {Moment(item._to).format('MMMM DD, YYYY')}</Text>
-
+                                <Card item={item} index={index}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        {/* {item.status == 'approved' ? null : */}
-                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.status == 'approved' ? Colors.gray : Colors.TheamColor3 }]}>
+                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.status === 'completed' ? Colors.gray : Colors.TheamColor3 }]}>
                                             {
                                                 item.status == 'approved' ?
-                                                    <View
-                                                        style={{ width: '100%' }}
-
-                                                    >
-                                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status == 'approved' ? '' : 'Submit'}</Text>
+                                                    <View style={{ width: '100%' }}>
+                                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>Submit</Text>
                                                     </View>
-
-
                                                     :
                                                     <TouchableOpacity
+                                                        disabled={item.status === 'completed' ? true : false}
                                                         style={{ width: '100%' }}
-                                                        onPress={() => {
-                                                            if (item.status == 'approved') { }
-                                                            else {
-                                                                Alert.alert(
-                                                                    "Submit",
-                                                                    `Are you sure you want to Submit ?`,
-                                                                    [
-                                                                        {
-                                                                            text: "Cancel",
-                                                                            onPress: () => console.log("Cancel Pressed"),
-                                                                            style: "cancel"
-                                                                        },
-                                                                        {
-                                                                            text: "OK", onPress: () => {
-                                                                                apiCall_approve(item.pk + "")
-                                                                            }
-                                                                        }
-                                                                    ],
-                                                                    { cancelable: true }
-                                                                );
-                                                            }
-
-                                                        }}
+                                                        onPress={() => showAlert(item)}
                                                     >
-                                                <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status == 'approved' ? '' : 'Submit'}</Text>
+                                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status == 'approved' ? '' : 'Submit'}</Text>
                                                     </TouchableOpacity>
-
-
                                             }
 
                                         </View>
                                     </View>
-                                </View>
+                                </Card>
                             )}
-
-                            keyExtractor={(item, index) => index.toString()}
                         />
-
-
                         :
                         <FlatList
                             style={{ marginTop: 6 }}
