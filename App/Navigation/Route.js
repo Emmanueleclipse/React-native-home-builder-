@@ -1,14 +1,12 @@
-
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Icon } from 'react-native-elements'
 
-import { Dimensions, Image, StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View, TouchableOpacity, Platform, DeviceEventEmitter } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { LocalData } from '../Common/Urls';
 
 import Splash from '../Screens/Splash';
 import Login from '../Screens/Login';
@@ -38,11 +36,16 @@ import WebLoad from '../Screens/WebLoad';
 import ImageDetail from '../Screens/ImageDetail';
 import NewMessageProperty from '../Screens/NewMessageProperty';
 import ScheduleHome from '../Screens/ScheduleHome';
+import { Urls } from '../Common/Urls';
+import Axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useIsFocused } from '@react-navigation/native'
 
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
 import Images from '../Theme/Images';
+import moment from 'moment';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -55,11 +58,51 @@ import Register from '../Screens/Register';
 
 
 const TabStack = () => {
+
+  const [notificationArray, setNotificationArray] = useState([])
+
+  const [badges, setBadges] = useState(null);
+
+  useEffect(() => {
+    apiCall_notificationlist();
+    DeviceEventEmitter.addListener(
+      'setBadge', () => {
+        setBadges(null);
+      },
+    )
+  }, []);
+
+  useEffect(() => {
+    notificationArray.length >= 1 ? setBadges(true) : null;
+  }, [notificationArray]);
+
+  const apiCall_notificationlist = async () => {
+    var access = await AsyncStorage.getItem('access')
+
+    const headers = {
+      'Authorization': 'Bearer ' + access,
+      "content-type": "application/json"
+    };
+    var url = 'notification/notifications/';
+
+    Axios.get(Urls.baseUrl + url, { headers })
+      .then(response => {
+        if (response.data != null) {
+          setNotificationArray(response.data.filter(el => moment(new Date()).format('DD MMM , yyyy') === moment(el.created_at).format('DD MMM , yyyy')))
+        }
+
+      }).catch(function (error) {
+        
+      });
+
+  };
+
+
   return (
     <TabBottom.Navigator
       lazy='true'
       initialRouteName="Home"
-      backBehavior = "initialRoute"
+      backBehavior="initialRoute"
       // backBehavior='Home'
       tabBarOptions={{
         showLabel: true,
@@ -97,6 +140,7 @@ const TabStack = () => {
           tabBarLabel: 'Notifications',
           tabBarIcon: ({ color, size }) => (
             <Icon type='material' name="notifications" color={color} size={size} />),
+          tabBarBadge: badges,
         }}
       />
 
@@ -160,7 +204,7 @@ const Route = () => (
       <Stack.Screen name='ImageDetail' component={ImageDetail} options={{ headerShown: true }} />
       <Stack.Screen name='ScheduleHome' component={ScheduleHome} options={{ headerShown: false }} />
 
-   </Stack.Navigator>
+    </Stack.Navigator>
   </NavigationContainer>
 );
 

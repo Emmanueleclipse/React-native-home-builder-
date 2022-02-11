@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    SafeAreaView,
+    SafeAreaView, DeviceEventEmitter,
     Text,
     View,
     Image,
@@ -31,11 +31,17 @@ const Home = ({ navigation, route }) => {
     const { pr_id } = route.params;
     const [isLoding, setLoding] = useState(true);
     const [userArray, setuserArray] = useState([])
+    const [notificationArray, setNotificationArray] = useState([])
+    const [badgeArray, setBadgeArray] = useState([])
+
     const isFocused = useIsFocused()
 
     useEffect(() => {
         apiCall_proprtylist()
+        apiCall_notificationlist()
     }, [isFocused]);
+    
+    DeviceEventEmitter.emit('setBadge');
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -55,7 +61,37 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
+                // console.log("======response.data", JSON.stringify(response.data))
                 if (response.data != null) { setuserArray(response.data) }
+
+            }).catch(function (error) {
+                setLoding(false);
+                if (error.response) {
+                    showToast(JSON.stringify(error.response.data.detail) + "", "error")
+                }
+            });
+
+    };
+
+
+    const apiCall_notificationlist = async () => {
+        var access = await AsyncStorage.getItem('access')
+        setLoding(true);
+
+        const headers = {
+            'Authorization': 'Bearer ' + access,
+            "content-type": "application/json"
+        };
+        var url = 'notification/notifications/';
+
+        Axios.get(Urls.baseUrl + url, { headers })
+            .then(response => {
+                setLoding(false);
+                console.log("======response.data", response.data);
+                if (response.data != null) {
+                    setBadgeArray(response.data.filter(el => moment(new Date()).format('DD MMM , yyyy') === moment(el.created_at).format('DD MMM , yyyy')));
+                    setNotificationArray(response.data);
+                }
 
             }).catch(function (error) {
                 setLoding(false);
@@ -79,41 +115,59 @@ const Home = ({ navigation, route }) => {
                 <FlatList
                     style={{ marginTop: 6 }}
                     showsVerticalScrollIndicator={false}
-                    data={userArray}
+                    data={notificationArray}
                     renderItem={({ item, index }) => (
+
                         <TouchableOpacity
-                            style={{ paddingHorizontal: 15, flexDirection: 'column' }}>
-
-                            {validationempty(item.activities) ?
-                                <FlatList
-                                    showsVerticalScrollIndicator={false}
-                                    data={item.activities}
-                                    renderItem={({ item, index }) => (
-                                        <TouchableOpacity
-                                            style={{ marginTop: 5, backgroundColor: 'white', elevation: 5, borderRadius: 10, marginVertical: 10, paddingLeft: 10 }}>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                {/* <View style={{ backgroundColor: '#D3D3D3', borderColor: 'black', borderWidth: 1, alignItems: "center", justifyContent: "center", height: 70, width: 70, borderRadius: 100, margin: 5, marginRight: 10 }} > */}
-                                                    {/* <Icon3 name={'notifications'} color={'black'} size={30} /> */}
-                                                    {/* <View style={{zIndex:1,position: 'absolute',bottom:2,right:-3,justifyContent:'center',alignItems:"center"}} >
-                                                        <Icon3 style={{zIndex:2,position:'absolute',bottom:2,right:3,}} name={'notifications'} color={'black'} size={20} />
-                                                    </View> */}
-                                                {/* </View> */}
-                                                <View style={{ padding: 15, flexDirection: 'column', paddingHorizontal: 8 }}>
-                                                    <Text style={[Style.text18, { fontFamily: CustomeFonts.Poppins_SemiBold }]}>{item.milestone_name}</Text>
-                                                    <Text style={[Style.text14, { paddingVertical: 5, }]}>{item.description}</Text>
-                                                    <Text style={[Style.text14, { paddingTop: 5, color: 'grey' }]}>{moment(item.created_at).format('DD MMM , yyyy')}</Text>
-                                                </View>
-                                            </View>
-                                            {/* <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View> */}
-                                        </TouchableOpacity>
-                                    )}
-                                    keyExtractor={(item, index) => index.toString()}
-                                // ListEmptyComponent={<NoData />}
-                                />
-                                : null}
-
-
+                            style={{ marginTop: 5, backgroundColor: 'white', elevation: 5, borderRadius: 10, marginVertical: 10, paddingLeft: 10, marginHorizontal: 10 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                {/* <View style={{ backgroundColor: '#D3D3D3', borderColor: 'black', borderWidth: 1, alignItems: "center", justifyContent: "center", height: 70, width: 70, borderRadius: 100, margin: 5, marginRight: 10 }} > */}
+                                {/* <Icon3 name={'notifications'} color={'black'} size={30} /> */}
+                                {/* <View style={{zIndex:1,position: 'absolute',bottom:2,right:-3,justifyContent:'center',alignItems:"center"}} >
+                                                            <Icon3 style={{zIndex:2,position:'absolute',bottom:2,right:3,}} name={'notifications'} color={'black'} size={20} />
+                                                        </View> */}
+                                {/* </View> */}
+                                <View style={{ padding: 15, flexDirection: 'column', paddingHorizontal: 8 }}>
+                                    <Text style={[Style.text18, { fontFamily: CustomeFonts.Poppins_SemiBold }]}>{item?.title}</Text>
+                                    <Text style={[Style.text14, { paddingVertical: 5, }]}>{item?.body}</Text>
+                                    <Text style={[Style.text14, { paddingTop: 5, color: 'grey' }]}>{moment(item.created_at).format('DD MMM , yyyy')}</Text>
+                                </View>
+                            </View>
+                            {/* <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View> */}
                         </TouchableOpacity>
+                        // <TouchableOpacity
+                        //     style={{ paddingHorizontal: 15, flexDirection: 'column' }}>
+
+                        //     {validationempty(item.activities) ?
+                        //         <FlatList
+                        //             showsVerticalScrollIndicator={false}
+                        //             data={item.activities}
+                        //             renderItem={({ item, index }) => (
+                        //                 <TouchableOpacity
+                        //                     style={{ marginTop: 5, backgroundColor: 'white', elevation: 5, borderRadius: 10, marginVertical: 10, paddingLeft: 10 }}>
+                        //                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        //                         {/* <View style={{ backgroundColor: '#D3D3D3', borderColor: 'black', borderWidth: 1, alignItems: "center", justifyContent: "center", height: 70, width: 70, borderRadius: 100, margin: 5, marginRight: 10 }} > */}
+                        //                             {/* <Icon3 name={'notifications'} color={'black'} size={30} /> */}
+                        //                             {/* <View style={{zIndex:1,position: 'absolute',bottom:2,right:-3,justifyContent:'center',alignItems:"center"}} >
+                        //                                 <Icon3 style={{zIndex:2,position:'absolute',bottom:2,right:3,}} name={'notifications'} color={'black'} size={20} />
+                        //                             </View> */}
+                        //                         {/* </View> */}
+                        //                         <View style={{ padding: 15, flexDirection: 'column', paddingHorizontal: 8 }}>
+                        //                             <Text style={[Style.text18, { fontFamily: CustomeFonts.Poppins_SemiBold }]}>{item.milestone_name}</Text>
+                        //                             <Text style={[Style.text14, { paddingVertical: 5, }]}>{item.description}</Text>
+                        //                             <Text style={[Style.text14, { paddingTop: 5, color: 'grey' }]}>{moment(item.created_at).format('DD MMM , yyyy')}</Text>
+                        //                         </View>
+                        //                     </View>
+                        //                     {/* <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View> */}
+                        //                 </TouchableOpacity>
+                        //             )}
+                        //             keyExtractor={(item, index) => index.toString()}
+                        //         // ListEmptyComponent={<NoData />}
+                        //         />
+                        //         : null}
+
+
+                        // </TouchableOpacity>
                     )}
                     keyExtractor={(item, index) => index.toString()}
                     ListEmptyComponent={<NoData itemtext="No activity" />}
