@@ -133,8 +133,11 @@ const App = ({ navigation }) => {
 
     }
 
-    const pickerDocument = async () => {
-        DocumentPicker.pickMultiple({ type: types.allFiles })
+    const pickerDocuments = async () => {
+        DocumentPicker.pickMultiple({ type: [DocumentPicker.types.pdf,
+            DocumentPicker.types.doc,
+            DocumentPicker.types.docx
+            ] })
         .then(DocumentPickerOptions => {  
             DocumentPickerOptions.map(file => (
                 pImage.push(file)
@@ -145,6 +148,18 @@ const App = ({ navigation }) => {
         .catch(err => console.log(err))
     };
     
+    const pickerImages = async () => {
+        DocumentPicker.pickMultiple({ type: [DocumentPicker.types.images,DocumentPicker.types.video] })
+        .then(DocumentPickerOptions => {  
+            DocumentPickerOptions.map(file => (
+                pImage.push(file)
+            ))
+            setPImage([...pImage])
+            setSelected(DocumentPickerOptions[0].name)
+        })
+        .catch(err => console.log(err))
+    };
+
     const clearSelection = item => {
         let currentFiles = pImage.filter(file => file.name !== item)
         setPImage([...currentFiles])
@@ -354,9 +369,15 @@ const App = ({ navigation }) => {
                         />
 
                         <Text style={[Style.text14, { fontFamily: CustomeFonts.Poppins_Bold, marginTop: 15, marginBottom: 6, color: Colors.lightblack, }]}>Attachment</Text>
-                        <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
-                            <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={pickerDocument}>
-                                <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload Files</Text>
+                        <View style={{ marginBottom: 10, flexDirection: 'column', width: '100%' }}>
+                           
+                        <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={pickerImages}>
+                                <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload Images/Videos</Text>
+                                <Icon3 name="attachment" color={Colors.black} size={18} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10,marginTop:10 }} onPress={pickerDocuments}>
+                                <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload Pdf, doc, csv</Text>
                                 <Icon3 name="attachment" color={Colors.black} size={18} />
                             </TouchableOpacity>
 
