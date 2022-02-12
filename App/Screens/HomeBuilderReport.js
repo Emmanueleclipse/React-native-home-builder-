@@ -106,31 +106,31 @@ const Home = ({ navigation, route }) => {
                     showToast(JSON.stringify(error.response.data) + "", "error")
                 }
             });
-        };
+    };
 
-        const showAlert = item => {
-            Alert.alert(
-                "Submit",
-                `Are you sure you want to Submit ?`,
-                [
-                    {
-                        text: "Cancel",
-                        onPress: () => console.log("Cancel Pressed"),
-                        style: "cancel"
-                    },
-                    {
-                        text: "OK", onPress: () => {
-                            if(item.status === 'Awaiting feedback'){
-                                return showToast("Awaiting feedback", "error")
-                            } else {
+    const showAlert = item => {
+        Alert.alert(
+            "Submit",
+            `Are you sure you want to Submit ?`,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                        if (item.status === 'Awaiting feedback') {
+                            return showToast("Awaiting feedback", "error")
+                        } else {
                             apiCall_approve(item.pk + "")
-                            }
                         }
                     }
-                ],
-                { cancelable: true }
-            );
-        }
+                }
+            ],
+            { cancelable: true }
+        );
+    }
 
     return (
         <SafeAreaView style={Style.cointainer}>
@@ -158,7 +158,7 @@ const Home = ({ navigation, route }) => {
                             renderItem={({ item, index }) => (
                                 <Card item={item} index={index}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.status === 'completed' ? Colors.gray : Colors.TheamColor3 }]}>
+                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.submitted && item.status !== 'ongoing' ? Colors.gray : item.status === 'completed' ? Colors.gray : Colors.TheamColor3 }]}>
                                             {
                                                 item.status == 'approved' ?
                                                     <View style={{ width: '100%' }}>
@@ -166,7 +166,7 @@ const Home = ({ navigation, route }) => {
                                                     </View>
                                                     :
                                                     <TouchableOpacity
-                                                        disabled={item.status === 'completed' ? true : false}
+                                                        disabled={item.submitted && item.status !== 'ongoing'}
                                                         style={{ width: '100%' }}
                                                         onPress={() => showAlert(item)}
                                                     >
