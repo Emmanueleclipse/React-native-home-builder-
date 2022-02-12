@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     Dimensions,
+    DeviceEventEmitter
 } from 'react-native';
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
@@ -32,6 +33,7 @@ const Home = ({ navigation, route }) => {
     const [isLoding, setLoding] = useState(true);
     const [userArray, setuserArray] = useState([])
     const isFocused = useIsFocused()
+    DeviceEventEmitter.emit('setBadge');
 
     useEffect(() => {
         apiCall_proprtylist()
