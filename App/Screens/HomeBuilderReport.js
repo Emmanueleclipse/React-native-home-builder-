@@ -27,12 +27,7 @@ const Home = ({ navigation, route }) => {
     const isFocused = useIsFocused()
 
     useEffect(() => {
-        if (validationempty(item)) {
-
-        }
-        else {
-            apiCall_proprtylist()
-        }
+        apiCall_proprtylist();
 
     }, [isFocused]);
 
@@ -44,7 +39,7 @@ const Home = ({ navigation, route }) => {
             'Authorization': 'Bearer ' + access,
             "content-type": "application/json"
         };
-        var url = 'api/property/'
+        var url = 'api/property/' + pr_id
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
@@ -73,7 +68,7 @@ const Home = ({ navigation, route }) => {
         }
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
-                setLoding(false);
+                apiCall_proprtylist();
                 showToast(response.data.detail + "", "info")
             }).catch(function (error) {
                 setLoding(false);
@@ -106,31 +101,31 @@ const Home = ({ navigation, route }) => {
                     showToast(JSON.stringify(error.response.data) + "", "error")
                 }
             });
-        };
+    };
 
-        const showAlert = item => {
-            Alert.alert(
-                "Submit",
-                `Are you sure you want to Submit ?`,
-                [
-                    {
-                        text: "Cancel",
-                        onPress: () => console.log("Cancel Pressed"),
-                        style: "cancel"
-                    },
-                    {
-                        text: "OK", onPress: () => {
-                            if(item.status === 'Awaiting feedback'){
-                                return showToast("Awaiting feedback", "error")
-                            } else {
+    const showAlert = item => {
+        Alert.alert(
+            "Submit",
+            `Are you sure you want to Submit ?`,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                        if (item.status === 'Awaiting feedback') {
+                            return showToast("Awaiting feedback", "error")
+                        } else {
                             apiCall_approve(item.pk + "")
-                            }
                         }
                     }
-                ],
-                { cancelable: true }
-            );
-        }
+                }
+            ],
+            { cancelable: true }
+        );
+    }
 
     return (
         <SafeAreaView style={Style.cointainer}>
@@ -151,14 +146,14 @@ const Home = ({ navigation, route }) => {
                             <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.TheamColor3 }]}>Messages</Text>
                         </TouchableOpacity>
                     </View>
-                    {validationempty(item) ?
+                    {validationempty(userArray?.activities) ?
                         <FlatList
                             showsVerticalScrollIndicator={false}
-                            data={milestoneArray}
+                            data={userArray?.activities}
                             renderItem={({ item, index }) => (
                                 <Card item={item} index={index}>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.status === 'completed' ? Colors.gray : Colors.TheamColor3 }]}>
+                                        <View style={[{ flex: 1, height: 40, marginVertical: 3, marginTop: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: item.submitted && item.status !== 'ongoing' ? Colors.gray : item.status === 'completed' ? Colors.gray : Colors.TheamColor3 }]}>
                                             {
                                                 item.status == 'approved' ?
                                                     <View style={{ width: '100%' }}>
@@ -166,7 +161,7 @@ const Home = ({ navigation, route }) => {
                                                     </View>
                                                     :
                                                     <TouchableOpacity
-                                                        disabled={item.status === 'completed' ? true : false}
+                                                        disabled={item.submitted && item.status !== 'ongoing'}
                                                         style={{ width: '100%' }}
                                                         onPress={() => showAlert(item)}
                                                     >
@@ -179,126 +174,8 @@ const Home = ({ navigation, route }) => {
                                 </Card>
                             )}
                         />
-                        :
-                        <FlatList
-                            style={{ marginTop: 6 }}
-                            showsVerticalScrollIndicator={false}
-                            data={userArray}
-                            renderItem={({ item, index }) => (
-                                <TouchableOpacity
-                                    style={{ paddingHorizontal: 10, flexDirection: 'column' }}>
+                        : null}
 
-                                    {validationempty(item.activities) ?
-                                        <FlatList
-                                            style={{ flex: 1, width: '100%', }}
-                                            showsVerticalScrollIndicator={false}
-                                            data={item.activities}
-                                            renderItem={({ item, index }) => (
-                                                <TouchableOpacity
-                                                    style={{
-                                                        flex: 1, borderBottomWidth: 1, borderColor: Colors.divider,
-                                                        flexDirection: 'column', paddingVertical: 10,
-                                                    }}>
-                                                    <Text style={[Style.text14, {}]}>{(index + 1)}  {item.milestone_name}</Text>
-
-                                                    {item.status == 'approved' ?
-                                                        <View style={{ flexDirection: 'row', }}>
-                                                            <Text style={[Style.text14, {
-                                                                flexShrink: 1, padding: 4, borderColor: Colors.gray_d1, borderWidth: 1, borderRadius: 8, color: Colors.TheamColor4, marginTop: 8
-                                                            }]}>{item.status}</Text>
-                                                        </View>
-                                                        :
-                                                        <View style={{ flexDirection: 'row', }}>
-                                                            <Text style={[Style.text14, {
-                                                                flexShrink: 1, padding: 4, borderColor: Colors.gray_d1, borderWidth: 1, borderRadius: 8, color: '#FB0015', marginTop: 8
-                                                            }]}>{item.status}</Text>
-
-                                                        </View>
-                                                    }
-
-
-                                                    <Text style={[Style.text14, { marginTop: 8 }]}>Due {Moment(item._to).format('MMMM DD, YYYY')}</Text>
-
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        {/* {item.status == 'approved' ? null : */}
-                                                        <View style={[Style.buttonStyle22, { flex: 1, marginRight: 8, backgroundColor: Colors.TheamColor4, borderWidth: 0, }]}>
-                                                            <TouchableOpacity
-                                                                style={{ width: '100%' }}
-                                                                onPress={() => {
-                                                                    if (item.status == 'approved') { }
-                                                                    else {
-                                                                        Alert.alert(
-                                                                            "Submit",
-                                                                            `Are you sure you want to Submit ?`,
-                                                                            [
-                                                                                {
-                                                                                    text: "Cancel",
-                                                                                    onPress: () => console.log("Cancel Pressed"),
-                                                                                    style: "cancel"
-                                                                                },
-                                                                                {
-                                                                                    text: "OK", onPress: () => {
-                                                                                        apiCall_approve(item.pk + "")
-                                                                                    }
-                                                                                }
-                                                                            ],
-                                                                            { cancelable: true }
-                                                                        );
-                                                                    }
-
-                                                                }}
-                                                            >
-                                                                <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status == 'approved' ? '' : 'Submit'}</Text>
-                                                            </TouchableOpacity>
-
-                                                        </View>
-                                                        {/* } */}
-                                                        {/* <View style={[Style.buttonStyle2, { flex: 1, marginRight: 8, backgroundColor: Colors.white, borderColor: '#CD1A1D', borderWidth: 2, }]}>
-                                                        <TouchableOpacity
-                                                            style={{ width: '100%' }}
-                                                            onPress={() => {
-                                                                Alert.alert(
-                                                                    "Delete",
-                                                                    `Are you sure you want to Delete ?`,
-                                                                    [
-                                                                        {
-                                                                            text: "Cancel",
-                                                                            onPress: () => console.log("Cancel Pressed"),
-                                                                            style: "cancel"
-                                                                        },
-                                                                        {
-                                                                            text: "OK", onPress: () => {
-                                                                                apiCall_delete(item.pk + "")
-                                                                            }
-                                                                        }
-                                                                    ],
-                                                                    { cancelable: true }
-                                                                );
-                    
-                                                            }}
-                                                        >
-                                                            <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.lightblack }]}>Delete</Text>
-                                                        </TouchableOpacity>
-                    
-                                                    </View> */}
-
-                                                    </View>
-
-                                                </TouchableOpacity>
-                                            )}
-                                            keyExtractor={(item, index) => index.toString()}
-                                            ListEmptyComponent={<NoData />}
-                                        />
-                                        : null}
-
-
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={(item, index) => index.toString()}
-
-                        />
-
-                    }
 
 
                     {/* <Text style={[Style.text14]}>Due {Moment(item._to).format('MMMM DD, YYYY')}</Text> */}
