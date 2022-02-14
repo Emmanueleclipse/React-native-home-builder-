@@ -138,7 +138,7 @@ const Login = ({ navigation, route }) => {
     const validationCheck = () => {
         if (
             validationBlank(selectedValue, "Select Property") &&
-            validationBlank(email, "Please Enter Email") &&
+            validationBlank(email, "This user has not accepted the invite, you cannot message them yet") &&
             validationBlank(username, "Please Enter subject") &&
             validationBlank(desc, "Please Enter message")
         ) {

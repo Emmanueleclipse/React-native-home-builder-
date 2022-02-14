@@ -24,10 +24,12 @@ import Axios from 'axios'
 import { WebView } from 'react-native-webview';
 import Moment from 'moment';
 import Icon2 from 'react-native-vector-icons/FontAwesome'
+import { useIsFocused } from '@react-navigation/native'
 
 
 
 const Home = ({ navigation, route }) => {
+    const isFocused = useIsFocused()
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
     const [linkname, setlinkname] = useState('')
@@ -37,7 +39,7 @@ const Home = ({ navigation, route }) => {
         apiCall_messages()
         var myemail = await AsyncStorage.getItem('email')
         setmyemail(myemail)
-    }, []);
+    }, [isFocused]);
 
     useEffect(() => { }, [linkname]);
 
