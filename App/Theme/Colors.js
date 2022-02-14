@@ -11,6 +11,7 @@ const Colors = {
     gray: 'gray',
     gray_d1: '#e3e3e3',
     divider: '#f5f5f5',
-    lightGreen:"#CBFAD0"
+    lightGreen:"#CBFAD0",
+    red:'#ff0000'
 }
 export default Colors

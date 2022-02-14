@@ -18,10 +18,11 @@ import { LocalData, Params, Urls } from '../Common/Urls';
 import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
+import DocumentPicker from 'react-native-document-picker';
 import Icon2 from 'react-native-vector-icons/AntDesign'
 import Icon3 from 'react-native-vector-icons/Entypo'
-import DocumentPicker, { types, DocumentPickerOptions } from 'react-native-document-picker'
-import SelectedFile from '../Compoment/SelectedFile';
+
+
 
 const App = ({ navigation }) => {
     //admin
@@ -37,17 +38,59 @@ const App = ({ navigation }) => {
     const [filename, setfilename] = useState('No File Choosen');
     const [pickerData, setpickerData] = useState([]);
 
-    const [profileImage, setProfileImage] = useState();
-    const [pImage, setPImage] = useState([]);
+    const [profileImage, setProfileImage] = useState({});
+    const [pImage, setPImage] = useState("");
     const [selectedValue, setSelectedValue] = useState('');
     const [selectedValue1, setSelectedValue1] = useState('');
-    const [selected, setSelected] = useState(false);
     const [date, setDate] = useState('')
     const [todate, settoDate] = useState('')
 
     useEffect(() => {
         apiCall_proprtylist()
     }, [])
+
+
+    const selectImage = async () => {
+        if (Platform.OS === 'ios') {
+
+        } else {
+            const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA)
+            // alert(granted)
+
+            console.log("granted", "granted")
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                // Pick multiple files
+                try {
+                    const res = await DocumentPicker.pickMultiple({
+                        type: [DocumentPicker.types.images,
+                        DocumentPicker.types.pdf,
+                        DocumentPicker.types.doc,
+                        DocumentPicker.types.docx
+                        ],
+                    });
+                    console.log(JSON.stringify(res))
+                    // setPImage(res.uri);
+                    // setProfileImage({
+                    //     uri: res.uri,
+                    //     name: res.name,
+                    //     type: res.type,
+                    // });
+                    // setfilename(res.name);
+                    setpickerData(res)
+
+                } catch (err) {
+                    if (DocumentPicker.isCancel(err)) {
+                        // User cancelled the picker, exit any dialogs or menus and move on
+                    } else {
+                        throw err;
+                    }
+                }
+            } else {
+                showToast("No permission", "info")
+
+            }
+        }
+    }
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -62,6 +105,7 @@ const App = ({ navigation }) => {
         Axios.get(Urls.baseUrl + 'api/property/', { headers })
             .then(response => {
                 setLoding(false);
+                console.log("======property", response.data)
 
                 var cars = response.data;
                 const newCar = {
@@ -93,9 +137,10 @@ const App = ({ navigation }) => {
 
             var access = await AsyncStorage.getItem('access')
             setloding(true);
+
             const headers = {
                 'Authorization': 'Bearer ' + access,
-                "content-type": false
+                "content-type": "application/json"
             };
 
             var formdata = new FormData();
@@ -104,23 +149,33 @@ const App = ({ navigation }) => {
             formdata.append('description', password);
             formdata.append('_from', date);
             formdata.append('_to', todate);
-    
-            if (pImage) {
-                pImage.map(file => (
-                    formdata.append('attachments', file)
-                ))
+            // formdata.append('attachment', profileImage);
+            let selectedFileArray = []
+            pickerData.map((item, index) => {
+                selectedFileArray.push({ uri: item.uri, name: item.name, type: item.type })
+            })
+            console.log('dd ',selectedFileArray)
+            // if (validationempty(pImage)) {
+            //     formdata.append('attachment', profileImage);
+            // }
+            if (selectedFileArray.length !== 0) {
+                formdata.append('attachment', selectedFileArray[0]);
             }
             else {
                 formdata.append('attachment', '');
             }
 
+            console.log(access);
+            console.log('formdata ::: ', formdata,Urls.baseUrl + 'api/activity/');
             Axios.post(Urls.baseUrl + 'api/activity/', formdata, { headers })
                 .then(response => {
+                    console.log("======ww", response)
                     setloding(false);
                     if (validationempty(response.data)) {
                         showToast('Added Successfully', "success");
                         navigation.popToTop();
                         navigation.navigate('CreateProperty', {})
+                        // setinfoclick(true)
                     }
                 }).catch(function (error) {
                     setloding(false);
@@ -132,24 +187,6 @@ const App = ({ navigation }) => {
         }
 
     }
-
-    const pickerDocument = async () => {
-        DocumentPicker.pickMultiple({ type: types.allFiles })
-        .then(DocumentPickerOptions => {  
-            DocumentPickerOptions.map(file => (
-                pImage.push(file)
-            ))
-            setPImage([...pImage])
-            setSelected(DocumentPickerOptions[0].name)
-        })
-        .catch(err => console.log(err))
-    };
-    
-    const clearSelection = item => {
-        let currentFiles = pImage.filter(file => file.name !== item)
-        setPImage([...currentFiles])
-    }
-
 
     const apiCall_Invite = async () => {
 
@@ -171,8 +208,12 @@ const App = ({ navigation }) => {
                 receiver: email,
                 invitation_type: 'homeowner'
             });
+
+            console.log(access);
+            console.log(params);
             Axios.post(Urls.baseUrl + 'api/invite-send/', params, { headers })
                 .then(response => {
+                    console.log("======", response)
                     isetLoding(false);
                     if (validationempty(response.data)) {
                         showToast('Invitation sent successfully !', "success");
@@ -183,6 +224,7 @@ const App = ({ navigation }) => {
                     }
                 }).catch(function (error) {
                     isetLoding(false);
+                    console.log(error.response);
                     if (error.response) {
                         showToast(JSON.stringify(error.response.data) + "", "error")
                     }
@@ -196,13 +238,57 @@ const App = ({ navigation }) => {
         return (<Picker.Item key={item.pk} label={item.name} value={item.pk} />)
     })
 
+    const CapturePhoto = async () => {
+        console.log("click on image ");
+        const options = {
+            title: "Select Image",
+            takePhotoButtonTitle: "Take Photo",
+            chooseFromLibraryButtonTitle: "Choose From Gallery",
+            quality: 1,
+            maxWidth: 500,
+            maxHeight: 500,
+            noData: true,
+            saveToPhotos: false,
+        };
+
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            {
+                title: "App Camera Permission",
+                message: "App needs access to your camera ",
+                buttonNegative: "Cancel",
+                buttonPositive: "OK",
+            }
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("You can use the camera");
+            launchImageLibrary(options, (response) => {
+                if (response.didCancel) {
+                    console.log("responce didCancel");
+                } else if (response.error) {
+                    console.log("responce error");
+                } else {
+                    const source = response.uri;
+                    console.log("response.type", response.type);
+                    console.log(response);
+                    setPImage(source);
+                    setProfileImage({
+                        uri: response.uri,
+                        name: response.fileName,
+                        type: response.type,
+                    });
+                    setfilename(response.fileName);
+                }
+            });
+        } else {
+            console.log("Camera permission denied");
+        }
+    };
+
     let items = userArray.map((item, index) => {
         return (<Picker.Item key={item.pk} label={item.name} value={item.pk} />)
     })
-
-    const selectedFiles =  pImage.map((image, i) => (
-        <SelectedFile key={i} fileName={image.name} onPress={() => clearSelection(image.name)}/>
-    ))
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
@@ -355,16 +441,14 @@ const App = ({ navigation }) => {
 
                         <Text style={[Style.text14, { fontFamily: CustomeFonts.Poppins_Bold, marginTop: 15, marginBottom: 6, color: Colors.lightblack, }]}>Attachment</Text>
                         <View style={{ marginBottom: 10, flexDirection: 'row', width: '100%' }}>
-                            <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={pickerDocument}>
+                        <TouchableOpacity style={{flexDirection:'row',borderRadius:10,elevation:5,backgroundColor:Colors.TheamColor,alignItems:'center',padding:5,paddingHorizontal:10 }} onPress={() => selectImage()}>
                                 <Text style={[Style.text16, { borderColor: Colors.lightblack, padding: 4, marginRight: 4, }]}>Upload Files</Text>
                                 <Icon3 name="attachment" color={Colors.black} size={18} />
                             </TouchableOpacity>
 
                         </View>
                         <View >
-
-                        { selected && selectedFiles }
-                            {/* {
+                            {
                                 pickerData.map((item, index) => {
                                     return (
                                         <View style={{ flexDirection: 'row', alignItems: "center", backgroundColor: 'white', elevation: 5, margin: 5, borderRadius: 10, padding: 15 }} >
@@ -378,7 +462,7 @@ const App = ({ navigation }) => {
                                         </View>
                                     )
                                 })
-                            } */}
+                            }
 
                         </View>
                         <View style={[Style.buttonStyle2, { width: '50%', marginTop: 20, }]}>
