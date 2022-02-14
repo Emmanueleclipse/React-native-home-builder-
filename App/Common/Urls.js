@@ -8,7 +8,6 @@ export const Urls = {
     resetpass: 'auth/password/reset/',
     property: 'property/',
     notificationa: '/notification/register/device/',
-    urlnames:'urls are',
 };
 
 export var LocalData = {

@@ -31,12 +31,10 @@ const Home = ({ navigation, route }) => {
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
     const [linkname, setlinkname] = useState('')
-    const [myemail, setmyemail] = useState('');
-    useEffect(async() => {
+
+    useEffect(() => {
         setlinkname('')
         apiCall_messages()
-        var myemail = await AsyncStorage.getItem('email')
-        setmyemail(myemail)
     }, []);
 
     useEffect(() => { }, [linkname]);
@@ -51,11 +49,9 @@ const Home = ({ navigation, route }) => {
             'Authorization': 'Bearer ' + access,
             "content-type": "application/json"
         };
-        console.log("======messages", Urls.baseUrl + 'api/messages/')
         Axios.get(Urls.baseUrl + 'api/messages/', { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======messages data", response.data)
                 if (response.data != null) { setuserArray(response.data) }
 
             }).catch(function (error) {
@@ -115,18 +111,17 @@ const Home = ({ navigation, route }) => {
                                         alignItems: 'center',
                                         flex: 1, 
                                         flexDirection: 'row', paddingVertical: 10,borderBottomWidth:1, borderBottomColor:'lightgrey',borderRadius:10
-                                    }}
-                                    onPress={()=>{navigation.navigate('ChatScreen',{item:item})}}>
+                                    }}>
                                     <View style={{ height: 50,justifyContent:'center',alignItems:'center', width: 50,marginLeft:10, backgroundColor: 'lightgrey', borderRadius: 100, borderColor: 'black' }} >
                                     <Text style={[Style.text18, { color: Colors.TheamColor2 }]}>{item.subject[0]}</Text>
 
                                     </View>
                                     <View style={{ flex: 1, paddingHorizontal:10 ,marginHorizontal:8 }} >
                                         <View style={{ flexDirection: 'row',}} >
-                                            <Text style={[Style.text18, { flex: 1, color: Colors.TheamColor2 }]} numberOfLines={2}>{item.subject}</Text>
+                                            <Text style={[Style.text18, { flex: 1, color: Colors.TheamColor2 }]}>{item.subject}</Text>
                                             <Text style={[Style.text14]}>{Moment(item.created_at).format('yyyy-MM-DD ')}</Text>
                                         </View>
-                                        <Text style={[Style.text16, {paddingTop:10, flex: 1 }]}>{item.send_to==myemail?item.send_by:item.send_to}</Text>
+                                        <Text style={[Style.text16, {paddingTop:10, flex: 1 }]}>{item.send_by}</Text>
                                     </View>
 
                                     {/* {validationempty(item.attachment) ? <Icon type='entypo' name="attachment" size={15}

@@ -26,38 +26,10 @@ import Axios from 'axios'
 const Home = ({ navigation, route }) => {
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
-    const [myPlan, setmyPlan]=useState('');
+
     useEffect(() => {
-        apiMy_Plan()
         apiCall_list()
     }, []);
-
-   
-    
-    
-    const apiMy_Plan = async () => {
-        var access = await AsyncStorage.getItem('access')
-        setLoding(true);
-
-        const headers = {
-            'Authorization': 'Bearer ' + access,
-            "content-type": "application/json"
-        };
-        Axios.get(Urls.baseUrl +'payments/current-subscription-plan/', { headers })
-            .then(response => {
-                setLoding(false);
-                console.log("======current plan is", response.data)
-                
-                setmyPlan(response.data)
-
-            }).catch(function (error) {
-                setLoding(false);
-                if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
-                }
-
-            });
-        };
 
     const apiCall_list = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -140,34 +112,6 @@ const Home = ({ navigation, route }) => {
 
 
                             </TouchableOpacity> */}
-                                <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>Current Plan</Text>
-
-                                <View
-                                        
-                                        style={{
-                                            borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
-                                            padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.lightGreen,
-                                        }}>
-                                         <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>{myPlan.package_name}</Text>
-                                         <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>{myPlan.description}</Text>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>Start date
-                                                    <Text style={[Style.text18, { lineHeight: 24, color: Colors.TheamColor2 }]}> {myPlan.start_date}</Text>
-                                                </Text>
-                                            </View>
-                                            
-                                        </View>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>Expire date
-                                                    <Text style={[Style.text18, { lineHeight: 24, color: Colors.red }]}> {myPlan.end_date}</Text>
-                                                </Text>
-                                            </View>
-                                            
-                                        </View>
-                                    </View>
-                                    <Text style={[Style.text18, { marginTop: 40, marginLeft: 8 }]}>Available Plans</Text>
 
                             <FlatList
                                 // style={{ borderRadius: 8, backgroundColor: Colors.divider }}
@@ -180,8 +124,6 @@ const Home = ({ navigation, route }) => {
                                             borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
                                             padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.divider,
                                         }}>
-                                        <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>{item.category}</Text>
-
                                         <Text style={[Style.text12, { marginLeft: 6, marginTop: 4, color: Colors.gray }]}>{item.description}</Text>
 
                                         <View style={{ flexDirection: 'row' }}>
