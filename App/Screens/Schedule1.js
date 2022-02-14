@@ -35,32 +35,16 @@ const Home = ({ navigation, route }) => {
     const [showimage, setshowImage] = useState(false);
     const [showpdf, setshowpdf] = useState(false);
     const [zoomImage, setzoomImage] = useState(false);
-    const [mimeType, setMimeType] = useState([])
+
 
     useEffect(() => {
-        loadFiles()
-    },[])
-
-    const loadFiles = () => {
-        item.attachments.map(item => setMimeType(item.type))
-    }
-    let data = []
-    const Uploaded = item.activities.map(item => item.attachments.map(item => {
-       return data.push({ type: item.type, attachment: item.attachment})
-    }))
-    
-    const images = data.map(item => item).filter(item => {
-        let file = item.type
-        return  file !== 'pdf' && file !== 'doc' && file !== 'csv'
-    })
-
-    const otherFiles = data.map(item => item).filter(item => {
-        let file = item.type
-        return file != 'jpg' && file != 'jpeg' & file != 'png' 
-    })
+        console.log(item);
+        // apiCall_proprtylist()
+    }, [isFocused]);
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
+        console.log("======access", access)
         setLoding(true);
 
         const headers = {
@@ -74,8 +58,10 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + url, { headers })
             .then(response => {
                 setLoding(false);
+                console.log("======response.data", response.data)
                 if (response.data != null) {
                     setuserArray(response.data)
+                    console.log("======response", userArray)
                 }
 
             }).catch(function (error) {
@@ -86,16 +72,17 @@ const Home = ({ navigation, route }) => {
             });
 
     };
+    console.log('.. ', item)
     const handleClick = (url) => {
         Linking.canOpenURL(url).then(supported => {
             if (supported) {
                 Linking.openURL(url);
             } else {
-                // console.log("Don't know how to open URI: " + this.props.url);
+                console.log("Don't know how to open URI: " + this.props.url);
             }
         });
     };
-    
+
     return (
         <SafeAreaView style={Style.cointainer}>
 
@@ -106,11 +93,11 @@ const Home = ({ navigation, route }) => {
                     <Indicator></Indicator>
                 </View>
                 :
-                <View 
+                <View
                     style={{ marginTop: 5, padding: 15, borderRadius: 10, margin: 5, elevation: 5, backgroundColor: 'white' }}>
                     <Text style={[Style.text16, { fontFamily: CustomeFonts.Poppins_Bold, color: Colors.TheamColor3 }]}>{item.name + ""}</Text>
                     <View style={{ flexDirection: 'row' }} >
-                        <Text onPress={handleClick} style={[Style.text14, { marginTop: 10, flex: 1, }]}>{item.address} , {item.state}</Text>
+                        <Text style={[Style.text14, { marginTop: 10, flex: 1, }]}>{item.address} , {item.state}</Text>
                         <Text style={[Style.text12, { marginTop: 10 }]}>{item.activities[0]._from} - {item.activities[0]._to}</Text>
 
 
@@ -132,26 +119,24 @@ const Home = ({ navigation, route }) => {
                     {
                         showimage ?
 
-                            images !== null  ?
+                            item.activities[0].attachment !== null && !(item.activities[0].attachment.includes('.doc') && !item.activities[0].attachment.includes('.csv') && !item.activities[0].attachment.includes('.pdf')) ?
 
-                                <FlatList
-                                    data={images}
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={({ item }) =>  (
-                                        <TouchableOpacity style={styles.list} onPress={() =>
-                                            setzoomImage(true)} >
-                                            <Image
-                                                resizeMode='center'
-                                                style={{ marginBottom: 4, height: '100%', width: '100%' }}
-                                                source={{ uri: Urls.imageUrl + item.attachment }} 
-                                                />
-                                        </TouchableOpacity>
-                                    )}
-        
-                                />
+                                <TouchableOpacity style={{
+                                    width: '100%', height: 150,
+                                }} onPress={() =>
+                                    setzoomImage(true)} >
+
+                                    <Image
+                                        resizeMode='cover'
+                                        style={{
+                                            justifyContent: 'center', alignSelf: 'center', marginBottom: 4,
+                                            height: '100%', width: '100%'
+                                        }}
+                                        source={{ uri: Urls.imageUrl + item.activities[0].attachment }} />
+                                </TouchableOpacity>
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center', marginVertical: 10 }]}>Data Not Found</Text>
+
                             :
                             null
 
@@ -162,27 +147,36 @@ const Home = ({ navigation, route }) => {
                     </TouchableOpacity>
                     {
                         showpdf ?
-                            otherFiles.length > 0  ?
-                                <FlatList
-                                    data={otherFiles}
-                                    renderItem={({ item }) => (
-                                        <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.attachments)} >                 
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10}}>
-                                                <Image
-                                                    resizeMode='contain'
-                                                    style={{ width: 20, height: 20, marginRight: 10}}
-                                                    source={item.type === 'pdf' && require('../assets/images/pdf.png') || item.type === 'csv' && require('../assets/images/csv.png' || item.type == 'doc' && require('../assets/images/doc.png' ))}
-                                                />
-                                                <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{item.attachment}</Text> 
-                                            </View>
-                                        </TouchableOpacity>
-                                    )}
-                                />
+                            item.activities[0].attachment !== null && (item.activities[0].attachment.includes('.doc') || item.activities[0].attachment.includes('.csv') || item.activities[0].attachment.includes('.pdf')) ?
+                                <TouchableOpacity onPress={() => handleClick(Urls.imageUrl + item.activities[0].attachment)} >
+                                    <Text style={[Style.text14, { textAlign: 'center' }]}>{Urls.imageUrl}{item.activities[0].attachment}</Text>
+                                </TouchableOpacity>
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center' }]}>Data Not Found</Text>
                             : null
                     }
                 </View>
+
+                // <FlatList
+                //     showsVerticalScrollIndicator={false}
+                //     data={userArray}
+                //     renderItem={({ item, index }) => (
+                //         <TouchableOpacity
+                //             style={{ marginTop: 5, paddingHorizontal: 5, }}>
+                //             <View style={{ flexDirection: 'row', paddingVertical: 6 }}>
+
+                //                 <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center', flexDirection: 'column', paddingHorizontal: 8 }}>
+                //                     <Text style={[Style.text16, { flex: 2, fontFamily: CustomeFonts.Poppins_SemiBold }]}>{item.milestone_name}</Text>
+                //                     <Text style={[Style.text12, { flex: 2, marginTop: 4 }]}>{item.description}</Text>
+                //                     <Text style={[Style.text12, { flex: 2, marginTop: 4 }]}>{item._from} TO {item._to}</Text>
+                //                 </View>
+                //             </View>
+                //             <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View>
+                //         </TouchableOpacity>
+                //     )}
+                //     keyExtractor={(item, index) => index.toString()}
+                //     ListEmptyComponent={<NoData />}
+                // />
 
             }
             {
@@ -213,13 +207,6 @@ const Home = ({ navigation, route }) => {
     );
 };
 
-const { width } = Dimensions.get('screen')
-const styles = StyleSheet.create({
-    list : {
-        width: width ,
-        height: 200
-    }
-})
 
 
 export default Home;

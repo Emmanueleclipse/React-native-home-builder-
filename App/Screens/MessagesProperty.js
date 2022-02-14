@@ -22,18 +22,22 @@ import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
 import { WebView } from 'react-native-webview';
+import moment from 'moment';
 import { useIsFocused } from '@react-navigation/native'
 
 const Home = ({ navigation, route }) => {
     const isFocused = useIsFocused()
     const { pr_id } = route.params;
+    const [myemail, setmyemail] = useState('');
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
     const [linkname, setlinkname] = useState('')
 
-    useEffect(() => {
+    useEffect(async() => {
         setlinkname('')
         apiCall_messages()
+        var myemail = await AsyncStorage.getItem('email')
+        setmyemail(myemail)
     }, [isFocused]);
 
 
@@ -42,6 +46,7 @@ const Home = ({ navigation, route }) => {
 
     const apiCall_messages = async () => {
         var access = await AsyncStorage.getItem('access')
+        
         var pk = await AsyncStorage.getItem('pk')
         setLoding(true);
 
@@ -104,7 +109,7 @@ const Home = ({ navigation, route }) => {
                             flexDirection: 'row', paddingVertical: 10, backgroundColor: Colors.TheamColor2
                         }}>
                         <Text style={[Style.text16, { marginLeft: 4, color: Colors.white, flex: 1 }]}>Time</Text>
-                        <Text style={[Style.text16, { marginHorizontal: 4, color: Colors.white, flex: 1 }]}>From</Text>
+                        <Text style={[Style.text16, { marginHorizontal: 4, color: Colors.white, flex: 1 }]}>With</Text>
                         <Text style={[Style.text16, { flex: 1.5, color: Colors.white, }]}>Subject</Text>
 
                     </TouchableOpacity>
@@ -120,9 +125,14 @@ const Home = ({ navigation, route }) => {
                                         justifyContent: 'center', alignItems: 'center',
                                         flex: 1, borderBottomWidth: 1, borderColor: Colors.divider,
                                         flexDirection: 'row', paddingVertical: 10
-                                    }}>
-                                    <Text style={[Style.text14, { flex: 1 }]}>{item.created_at}</Text>
-                                    <Text style={[Style.text14, { marginHorizontal: 6, flex: 1 }]}>{item.send_by}</Text>
+                                    }}
+                                    onPress={()=>navigation.navigate('ChatScreen',{item:item})}>
+                                        <View>
+                                        <Text style={[Style.text14, { flex: 1 }]}>{moment(item.created_at).format('DD MMM')}</Text>
+                                        <Text style={[Style.text14, { flex: 1 }]}>{moment.utc(item.created_at).local().format('hh:mm a')}</Text>
+
+                                        </View>
+                                    <Text style={[Style.text14, { marginHorizontal: 6, flex: 1 }]}>{item.send_to==myemail?item.send_by:item.send_to}</Text>
                                     <Text style={[Style.text14, { color: Colors.TheamColor2, flex: 1.5 }]}>{item.subject}</Text>
 
                                     {validationempty(item.attachment) ? <Icon type='entypo' name="attachment" size={15}

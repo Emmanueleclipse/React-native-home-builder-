@@ -1,8 +1,8 @@
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Icon } from 'react-native-elements'
 
-import { Dimensions, Image, StyleSheet, Text, View, TouchableOpacity, Platform, DeviceEventEmitter } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -11,17 +11,22 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { LocalData } from '../Common/Urls';
 
 import Splash from '../Screens/Splash';
+
 import Login from '../Screens/Login';
 import Feed from '../Screens/Feed';
 import HomeOwnerReport from '../Screens/HomeOwnerReport';
 import HomeBuilderReport from '../Screens/HomeBuilderReport';
 import Buildphase from '../Screens/Buildphase';
 import Messages from '../Screens/Messages';
+import ChatScreen from '../Screens/ChatScreen';
+
 import Schedule from '../Screens/Schedule';
 import Schedule1 from '../Screens/Schedule1';
 import Headline from '../Screens/Headline';
 import More from '../Screens/More';
 import NewMessage from '../Screens/NewMessage';
+import MessageFullView from '../Screens/MessageFullView';
+import MessageReply from '../Screens/MessageReply';
 import MessagesProperty from '../Screens/MessagesProperty';
 import Crew from '../Screens/Crew';
 import Crewdetail from '../Screens/Crewdetail';
@@ -38,14 +43,11 @@ import WebLoad from '../Screens/WebLoad';
 import ImageDetail from '../Screens/ImageDetail';
 import NewMessageProperty from '../Screens/NewMessageProperty';
 import ScheduleHome from '../Screens/ScheduleHome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Urls } from '../Common/Urls';
-import Axios from 'axios'
+
 
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
 import Images from '../Theme/Images';
-import moment from 'moment';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -58,43 +60,6 @@ import Register from '../Screens/Register';
 
 
 const TabStack = () => {
-  const [notificationArray, setNotificationArray] = useState([])
-  const [badges, setBadges] = useState(null);
-
-  useEffect(() => {
-    apiCall_notificationlist();
-    DeviceEventEmitter.addListener(
-      'setBadge', () => {
-        setBadges(null);
-      },
-    )
-  }, []);
-
-  useEffect(() => {
-    notificationArray.length >= 1 ? setBadges(true) : null;
-  }, [notificationArray]);
-
-  const apiCall_notificationlist = async () => {
-    var access = await AsyncStorage.getItem('access')
-
-    const headers = {
-      'Authorization': 'Bearer ' + access,
-      "content-type": "application/json"
-    };
-    var url = 'notification/notifications/';
-
-    Axios.get(Urls.baseUrl + url, { headers })
-      .then(response => {
-        if (response.data != null) {
-          setNotificationArray(response.data.filter(el => moment(new Date()).format('DD MMM , yyyy') === moment(el.created_at).format('DD MMM , yyyy')))
-        }
-
-      }).catch(function (error) {
-        
-      });
-
-  };
-
   return (
     <TabBottom.Navigator
       lazy='true'
@@ -137,7 +102,6 @@ const TabStack = () => {
           tabBarLabel: 'Notifications',
           tabBarIcon: ({ color, size }) => (
             <Icon type='material' name="notifications" color={color} size={size} />),
-          tabBarBadge:badges
         }}
       />
 
@@ -176,12 +140,15 @@ const Route = () => (
     <Stack.Navigator initialRouteName='Splash' >
       <Stack.Screen name='Splash' component={Splash} options={{ headerShown: false }} />
       <Stack.Screen name='Register' component={Register} options={{ headerShown: false }} />
+      <Stack.Screen name='ChatScreen' component={ChatScreen} options={{ headerShown: false }} />
       <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
       <Stack.Screen name='Home' component={TabStack} options={{ headerShown: false }} />
       <Stack.Screen name='HomeOwnerReport' component={HomeOwnerReport} options={{ headerShown: false }} />
       <Stack.Screen name='HomeBuilderReport' component={HomeBuilderReport} options={{ headerShown: false }} />
       <Stack.Screen name='Buildphase' component={Buildphase} options={{ headerShown: false }} />
+      <Stack.Screen name='MessageFullView' component={MessageFullView} options={{ headerShown: false }} />
       <Stack.Screen name='NewMessage' component={NewMessage} options={{ headerShown: false }} />
+      <Stack.Screen name='MessageReply' component={MessageReply} options={{ headerShown: false }} />
       <Stack.Screen name='NewMessageProperty' component={NewMessageProperty} options={{ headerShown: false }} />
       <Stack.Screen name='Messages' component={Messages} options={{ headerShown: false }} />
       <Stack.Screen name='MessagesProperty' component={MessagesProperty} options={{ headerShown: false }} />
