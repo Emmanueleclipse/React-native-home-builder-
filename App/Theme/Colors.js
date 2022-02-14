@@ -12,6 +12,6 @@ const Colors = {
     gray_d1: '#e3e3e3',
     divider: '#f5f5f5',
     lightGreen:"#CBFAD0",
-    red:'#ff0000'
+    red:'#FB0015'
 }
 export default Colors

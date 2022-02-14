@@ -188,7 +188,7 @@ const Home = ({ navigation, route }) => {
                                                         style={{ width: '100%' }}
 
                                                     >
-                                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status == 'approved' ? '' : 'Submit'}</Text>
+                                                        <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.white }]}>{item.status !== 'ongoing' ? '' : 'Submit'}</Text>
                                                     </View>
 
 
@@ -196,7 +196,7 @@ const Home = ({ navigation, route }) => {
                                                     <TouchableOpacity
                                                         style={{ width: '100%' }}
                                                         onPress={() => {
-                                                            if (item.status == 'approved') { }
+                                                            if (item.status !== 'ongoing') { }
                                                             else {
                                                                 Alert.alert(
                                                                     "Submit",
@@ -288,7 +288,7 @@ const Home = ({ navigation, route }) => {
                                                     }}>
                                                     <Text style={[Style.text14, {}]}>{(index + 1)}  {item.milestone_name}</Text>
 
-                                                    {item.status == 'approved' ?
+                                                    {item.status !== 'ongoing' ?
                                                         <View style={{ flexDirection: 'row', }}>
                                                             <Text style={[Style.text14, {
                                                                 flexShrink: 1, padding: 4, borderColor: Colors.gray_d1, borderWidth: 1, borderRadius: 8, color: Colors.TheamColor4, marginTop: 8
@@ -312,7 +312,7 @@ const Home = ({ navigation, route }) => {
                                                             <TouchableOpacity
                                                                 style={{ width: '100%' }}
                                                                 onPress={() => {
-                                                                    if (item.status == 'approved') { }
+                                                                    if (item.status !== 'ongoing') { }
                                                                     else {
                                                                         Alert.alert(
                                                                             "Submit",
