@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { PermissionsAndroid, StyleSheet, Modal, Picker, Button, SafeAreaView, View, Image, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import { 
+    PermissionsAndroid, StyleSheet, Modal, Picker, Button, SafeAreaView, View, Image, Text, ImageBackground, TouchableOpacity 
+} from 'react-native';
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
 import Style, { HEIGHT, WIDTH } from '../Theme/Style';
