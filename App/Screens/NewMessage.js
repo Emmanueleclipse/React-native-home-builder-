@@ -265,6 +265,7 @@ const Login = ({ navigation }) => {
                                                             setEmail(userArray[itemIndex].homebuilder)
                                                         }
                                                         else {
+                                                            userArray[itemIndex].homeowner==null?showToast("This user has not accepted the invite, you cannot message them yet", 'error'):null
                                                             setEmail(userArray[itemIndex].homeowner)
                                                         }
                                                     }
