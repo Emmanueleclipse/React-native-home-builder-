@@ -83,7 +83,7 @@ const Home = ({ navigation, route }) => {
                 setLoding(false);
                 console.log("======", error.response)
                 if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
+                    showToast(JSON.stringify(error.response.data )+ "", "error")
                 }
 
             });
@@ -190,15 +190,13 @@ const Home = ({ navigation, route }) => {
                                                 </View>
                                             </MenuOption>
 
-                                            {/* 
                                             <MenuOption value={2} style={{ marginTop: 6 }} onSelect={() => { navigation.navigate('Crewdetail', { pk: item.pk, name: item.name }) }}>
                                                 <View style={{ flexDirection: 'row', }}>
                                                     <Icon name={'anchor'} type={'font-awesome'} size={20} style={{ width: 25 }} color={Colors.lightblack}
                                                     />
                                                     <Text style={[Style.text16, { justifyContent: 'center', textAlignVertical: 'center', paddingLeft: 10 }]}>Manage Crew</Text>
                                                 </View>
-                                            </MenuOption> 
-                                            */}
+                                            </MenuOption>
 
                                         </MenuOptions>
                                     </Menu> :
@@ -207,7 +205,7 @@ const Home = ({ navigation, route }) => {
                                     <Menu>
                                         <MenuTrigger
                                             onPress={() => {
-                                                navigation.navigate('ScheduleHome', { pr_id: item.pk })
+                                                navigation.navigate('ScheduleHome', { pr_id: item.pk})
                                             }}>
                                             <Icon
                                                 type='material-community' name="calendar" size={18} color={Colors.white} style={{ color: Colors.white, padding: 10, borderRadius: 4, backgroundColor: Colors.TheamColor2 }} />
