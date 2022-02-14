@@ -25,6 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
 import { useIsFocused } from '@react-navigation/native'
 import ImageViewer from 'react-native-image-zoom-viewer';
+import nodata from '../assets/images/nodata.png'
 
 const Home = ({ navigation, route }) => {
     const { pr_id, item } = route.params;
@@ -36,6 +37,7 @@ const Home = ({ navigation, route }) => {
     const [showpdf, setshowpdf] = useState(false);
     const [zoomImage, setzoomImage] = useState(false);
     const [mimeType, setMimeType] = useState([])
+    const [index, setIndex] = useState(0)
 
     useEffect(() => {
         loadFiles()
@@ -59,33 +61,12 @@ const Home = ({ navigation, route }) => {
         return file != 'jpg' && file != 'jpeg' & file != 'png' 
     })
 
-    const apiCall_proprtylist = async () => {
-        var access = await AsyncStorage.getItem('access')
-        setLoding(true);
+    let imageArr = []
+    
+    const viewImages = images.map(item => {
+        return imageArr.push({ url: `${Urls.imageUrl}${item.attachment}`})
+    })
 
-        const headers = {
-            'Authorization': 'Bearer ' + access,
-            "content-type": "application/json"
-        };
-        var url;
-        if (validationempty(pr_id)) {
-            url = 'api/property/' + pr_id
-        }
-        Axios.get(Urls.baseUrl + url, { headers })
-            .then(response => {
-                setLoding(false);
-                if (response.data != null) {
-                    setuserArray(response.data)
-                }
-
-            }).catch(function (error) {
-                setLoding(false);
-                if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
-                }
-            });
-
-    };
     const handleClick = (url) => {
         Linking.canOpenURL(url).then(supported => {
             if (supported) {
@@ -203,7 +184,8 @@ const Home = ({ navigation, route }) => {
                             backgroundColor: Colors.white
                         }}>
                             <ImageViewer enableSwipeDown={true} onSwipeDown={() => { setzoomImage(false); }}
-                                imageUrls={[{ props: { source: '' }, url: Urls.imageUrl + item.activities[0].attachment }]}
+                                index={index}
+                                imageUrls={imageArr}
                             />
                         </View>
                     </Modal>
