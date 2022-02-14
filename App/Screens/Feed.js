@@ -6,19 +6,13 @@ import {
     Image,
     FlatList, Platform,
     TouchableOpacity,
-    StyleSheet,
-    Dimensions,
     Switch
 } from 'react-native';
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
-import Style, { HEIGHT } from '../Theme/Style';
-import {
-    validatePhone, validateEmail, validateName, matchPassword,
-    validationempty, validationBlank, validatePassword
-} from '../Common/Validations';
-import { ListItem, Icon } from 'react-native-elements'
-import { LocalData, Params, Urls } from '../Common/Urls';
+import Style from '../Theme/Style';
+import { validationempty } from '../Common/Validations';
+import { LocalData, Urls } from '../Common/Urls';
 import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
@@ -38,8 +32,8 @@ const Home = ({ navigation, route }) => {
     const [linkname, setlinkname] = useState('')
     const [isAll, setisAll] = useState(true);
     const [isToday, setisToday] = useState(false);
-
     const [isEnabled, setIsEnabled] = useState(false);
+    const [onRefresh, setOnRefresh] = useState(false);
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
@@ -86,9 +80,7 @@ const Home = ({ navigation, route }) => {
         getToken()
         setlinkname('')
         apiCall_proprtylist()
-    }, [isFocused]);
-
-    useEffect(() => { }, [linkname]);
+    }, [linkname]);
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -114,7 +106,7 @@ const Home = ({ navigation, route }) => {
                         }
                     })
                     data.sort(function (a, b) {
-                        return a.activities[0]._from - b.activities[0]._from
+                        return b.activities[0]._from - a.activities[0]._from
                     })
                     setTodayUserArray(data.filter(el => Moment(new Date()).format('MMMM DD') === Moment(el.activities[0]._from).format('MMMM DD')));
                     setuserArray(data);
@@ -132,11 +124,13 @@ const Home = ({ navigation, route }) => {
     const ToggleToday = () => {
         setisToday(true)
         setisAll(false)
+        apiCall_proprtylist()
     }
-
+    
     const ToggleAll = () => {
         setisAll(true)
         setisToday(false)
+        apiCall_proprtylist()
     }
 
     const datalength = () => { return isEnabled ? userArray.length : todayUserArray.length }
@@ -175,6 +169,8 @@ const Home = ({ navigation, route }) => {
                             </TouchableOpacity>
                         </View> :
                         <FlatList
+                            onRefresh={apiCall_proprtylist}
+                            refreshing={isLoding}
                             showsVerticalScrollIndicator={false}
                             data={isEnabled ? userArray : todayUserArray}
                             renderItem={({ item, index }) => (
