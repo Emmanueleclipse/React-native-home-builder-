@@ -140,7 +140,7 @@ const Home = ({ navigation, route }) => {
                     <View style={[{ width: '50%', marginTop: 20, justifyContent: 'center', alignSelf: 'center' }]}>
                         <TouchableOpacity
                             style={{ width: '100%', alignItems: "center" }}
-                            onPress={() => navigation.navigate('Messages')}
+                            onPress={() => navigation.navigate('MessagesProperty', { pr_id: pr_id })}
                         >
                             <Icon name={'message-bulleted'} type={'material-community'} color={Colors.TheamColor2} size={35} style={{ width: 40, justifyContent: 'flex-start' }} />
                             <Text style={[Style.text14, { textAlign: 'center', width: '100%', color: Colors.TheamColor3 }]}>Messages</Text>

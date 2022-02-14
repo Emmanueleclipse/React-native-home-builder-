@@ -120,6 +120,9 @@ const Home = ({ navigation, route }) => {
                                         justifyContent: 'center', alignItems: 'center',
                                         flex: 1, borderBottomWidth: 1, borderColor: Colors.divider,
                                         flexDirection: 'row', paddingVertical: 10
+                                    }}
+                                    onPress={() => {
+                                        navigation.navigate('ChatScreen', {item})
                                     }}>
                                     <Text style={[Style.text14, { flex: 1 }]}>{item.created_at}</Text>
                                     <Text style={[Style.text14, { marginHorizontal: 6, flex: 1 }]}>{item.send_by}</Text>
