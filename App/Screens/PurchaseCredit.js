@@ -126,30 +126,19 @@ const Home = ({ navigation, route }) => {
                                     borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
                                     padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.divider,
                                 }}>
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'ghost'} type={'simple-line-icon'} size={22} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text18, { marginTop: 4 }]}>Day Pass</Text>
-
                                 </View>
-
                                 <Text style={[Style.text12, { marginLeft: 6, marginTop: 4, color: Colors.gray }]}>What You'll Get</Text>
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'checkmark-circle'} type={'ionicon'} size={20} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text14, { marginTop: 4 }]}>8 hours usage of our coworking space</Text>
-
                                 </View>
-
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'checkmark-circle'} type={'ionicon'} size={20} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text14, { marginTop: 4 }]}>Access to All our rooms</Text>
-
                                 </View>
-
-
-
                             </TouchableOpacity> */}
                             <Text style={[Style.text18, { marginLeft: 10, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack }]}>Available Plans</Text>
 
@@ -248,5 +237,3 @@ const Data = [
 ];
 
 export default Home;
-
-

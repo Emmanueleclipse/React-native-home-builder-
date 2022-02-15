@@ -25,6 +25,8 @@ import MessagesProperty from '../Screens/MessagesProperty';
 import Crew from '../Screens/Crew';
 import Crewdetail from '../Screens/Crewdetail';
 import Addcrew from '../Screens/Addcrew';
+import ChatScreen from '../Screens/ChatScreen';
+
 import ManageHome from '../Screens/ManageHome';
 import UserSetting from '../Screens/UserSetting';
 import ResetPassword from '../Screens/ResetPassword';
@@ -199,6 +201,7 @@ const Route = () => (
       <Stack.Screen name='WebLoad' component={WebLoad} options={{ headerShown: true }} />
       <Stack.Screen name='ImageDetail' component={ImageDetail} options={{ headerShown: true }} />
       <Stack.Screen name='ScheduleHome' component={ScheduleHome} options={{ headerShown: false }} />
+      <Stack.Screen name='ChatScreen' component={ChatScreen} options={{ headerShown: false }} />
 
    </Stack.Navigator>
   </NavigationContainer>

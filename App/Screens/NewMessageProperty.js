@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Picker, Button, PermissionsAndroid, SafeAreaView, View, Image, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import { Picker, Button,Modal, StyleSheet, PermissionsAndroid, SafeAreaView, View, Image, Text, ImageBackground, TouchableOpacity } from 'react-native';
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
 import Style, { HEIGHT, WIDTH } from '../Theme/Style';
@@ -7,6 +7,8 @@ import TextInput from '../Compoment/TextInput';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RadioButton } from 'react-native-paper';
 import Icon1 from 'react-native-vector-icons/Ionicons'
+import Icon from 'react-native-vector-icons/Ionicons'
+import Icon2 from 'react-native-vector-icons/AntDesign'
 import {
     validatePhone, validateEmail, validateName, matchPassword,
     validationempty, validationBlank, validatePassword
@@ -32,17 +34,15 @@ const Login = ({ navigation, route }) => {
     const [desc, SetDesc] = useState('');
     const [userArray, setuserArray] = useState([])
     const [selectedValue, setSelectedValue] = useState('');
+    const [inviteSuccessModal, setInviteSuccessModal] = useState(false)
 
     useEffect(() => {
         apiCall_proprtylist()
-
-
     }, [])
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
         var pk = await AsyncStorage.getItem('pk')
-        console.log("pk", pk);
         setLoding(true);
 
         const headers = {
@@ -52,10 +52,10 @@ const Login = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + 'api/property/' + pr_id, { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======propertyhgh", response.data)
                 if (validationempty(response.data.pk)) {
                     is = '1';
                     setSelectedValue(response.data.pk + "")
+                    if(!response.data.homebuilder || !response.data.homeowner) return setInviteSuccessModal(!inviteSuccessModal)
                     if (LocalData.FLAG == '1') {
                         setEmail(response.data.homebuilder)
                     }
@@ -109,11 +109,9 @@ const Login = ({ navigation, route }) => {
         else {
             formdata.append('attachment', '');
         }
-        console.log(access);
-        console.log(formdata);
+        
         Axios.post(Urls.baseUrl + 'api/messages/', formdata, { headers })
             .then(response => {
-                console.log("======", response)
                 setloding(false);
                 if (validationempty(response.data)) {
                     showToast('Added Successfully', "success");
@@ -138,7 +136,7 @@ const Login = ({ navigation, route }) => {
     const validationCheck = () => {
         if (
             validationBlank(selectedValue, "Select Property") &&
-            validationBlank(email, "Please Enter Email") &&
+            validationBlank(email, "This user has not accepted the invite, you cannot message them yet") &&
             validationBlank(username, "Please Enter subject") &&
             validationBlank(desc, "Please Enter message")
         ) {
@@ -153,7 +151,6 @@ const Login = ({ navigation, route }) => {
             const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA)
             // alert(granted)
 
-            console.log("granted", "granted")
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 // Pick multiple files
                 try {
@@ -342,10 +339,7 @@ const Login = ({ navigation, route }) => {
                                     </View> :
                                     <TouchableOpacity
                                         style={{ width: '100%' }}
-                                        onPress={() => {
-                                            validationCheck()
-
-                                        }}
+                                        onPress={validationCheck}
                                     >
                                         <Text style={[Style.text16, { lineHeight: 20, textAlign: 'center', width: '100%', color: Colors.white }]}>SEND</Text>
                                     </TouchableOpacity>
@@ -354,6 +348,40 @@ const Login = ({ navigation, route }) => {
 
                         </View>
                     </View>
+                    <Modal
+                        useNativeDriver={false}
+                        animationType="slide"
+                        transparent={true}
+                        visible={inviteSuccessModal}
+                        onRequestClose={() => {
+                            setInviteSuccessModal(!inviteSuccessModal);
+                            navigation.popToTop();
+                        }}>
+
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView1}>
+                                <ScrollView contentContainerStyle={styles.modalView}>
+                                <View style={{ flex: 1, justifyContent: 'flex-end', alignSelf: 'flex-end' }}>
+                                                <Icon onPress={() => {
+                                                    setInviteSuccessModal(false)
+                                                }}
+                                                    name={'close'} type={'ionicon'} size={25} color={Colors.gray} />
+                                            </View>
+                                    <View style={[Style.cointainer, { justifyContent: 'center' }]}>
+                                        <Icon
+                                            name='warning'
+                                            size={60}
+                                            color={Colors.TheamColor2}
+                                            style={{alignSelf: 'center', marginBottom: 30}}
+                                        />
+                                        <Text style={[Style.text14, { fontFamily: CustomeFonts.Poppins_Bold, textAlign: 'center', paddingBottom: 20 }]}>User has not accepted the invite</Text>
+                                    </View>
+
+                                </ScrollView>
+                            </View>
+
+                        </View>
+                    </Modal>
                 </ScrollView>
             </View>
             {/* </ImageBackground> */}
@@ -380,5 +408,40 @@ const Data = [
 
 
 ];
+
+const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(22, 27, 70, 0.5)'
+
+    },
+    modalView: {
+        width: '90%',
+        backgroundColor: Colors.white,
+        borderRadius: 8,
+        padding: 10,
+        alignSelf: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 2
+    },
+    modalView1: {
+        width: '100%',
+        backgroundColor: 'transparent',
+    },
+    image: {
+        width: '100%',
+        height: 150,
+        resizeMode: 'contain',
+    },
+
+})
 
 export default Login;
