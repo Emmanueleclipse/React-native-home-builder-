@@ -40,7 +40,6 @@ const Login = ({ navigation }) => {
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
         var pk = await AsyncStorage.getItem('pk')
-        console.log("pk", pk);
         setLoding(true);
 
         const headers = {
@@ -50,7 +49,6 @@ const Login = ({ navigation }) => {
         Axios.get(Urls.baseUrl + 'api/property/', { headers })
             .then(response => {
                 setLoding(false);
-                console.log("======property", response.data)
 
                 var cars = response.data;
                 const newCar = {
@@ -93,11 +91,9 @@ const Login = ({ navigation }) => {
         else {
             formdata.append('attachment', '');
         }
-        console.log(access);
-        console.log(formdata);
+    
         Axios.post(Urls.baseUrl + 'api/messages/', formdata, { headers })
             .then(response => {
-                console.log("======", response)
                 setloding(false);
                 if (validationempty(response.data)) {
                     showToast('Added Successfully', "success");
@@ -172,7 +168,6 @@ const Login = ({ navigation }) => {
     }
 
     const CapturePhoto = async () => {
-        console.log("click on image ");
         const options = {
             title: "Select Image",
             takePhotoButtonTitle: "Take Photo",
@@ -270,6 +265,7 @@ const Login = ({ navigation }) => {
                                                             setEmail(userArray[itemIndex].homebuilder)
                                                         }
                                                         else {
+                                                            userArray[itemIndex].homeowner==null?showToast("This user has not accepted the invite, you cannot message them yet", 'error'):null
                                                             setEmail(userArray[itemIndex].homeowner)
                                                         }
                                                     }

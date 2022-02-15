@@ -26,38 +26,12 @@ import Axios from 'axios'
 const Home = ({ navigation, route }) => {
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
-    const [myPlan, setmyPlan]=useState('');
+    const [userPlan, setuserPlan] = useState([])
+
     useEffect(() => {
-        apiMy_Plan()
         apiCall_list()
+        apiCall_CurrentPlanlist()
     }, []);
-
-   
-    
-    
-    const apiMy_Plan = async () => {
-        var access = await AsyncStorage.getItem('access')
-        setLoding(true);
-
-        const headers = {
-            'Authorization': 'Bearer ' + access,
-            "content-type": "application/json"
-        };
-        Axios.get(Urls.baseUrl +'payments/current-subscription-plan/', { headers })
-            .then(response => {
-                setLoding(false);
-                console.log("======current plan is", response.data)
-                
-                setmyPlan(response.data)
-
-            }).catch(function (error) {
-                setLoding(false);
-                if (error.response) {
-                    showToast(JSON.stringify(error.response.data) + "", "error")
-                }
-
-            });
-        };
 
     const apiCall_list = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -68,16 +42,16 @@ const Home = ({ navigation, route }) => {
             'Authorization': 'Bearer ' + access,
             "content-type": "application/json"
         };
-        Axios.get(Urls.baseUrl +'payments/subscription-plans/', { headers })
+        Axios.get(Urls.baseUrl + 'payments/subscription-plans/', { headers })
             .then(response => {
                 setLoding(false);
                 console.log("======plans", response.data)
-                if(response.data[0].subscription_type === 'free') {
+                if (response.data[0].subscription_type === 'free') {
                     setuserArray(response.data.slice(1))
                 }
                 else {
                     setuserArray(response.data)
- 
+
                 }
 
             }).catch(function (error) {
@@ -87,8 +61,31 @@ const Home = ({ navigation, route }) => {
                 }
 
             });
-        };
+    };
 
+    const apiCall_CurrentPlanlist = async () => {
+        var access = await AsyncStorage.getItem('access')
+        var pk = await AsyncStorage.getItem('pk')
+        setLoding(true);
+
+        const headers = {
+            'Authorization': 'Bearer ' + access,
+            "content-type": "application/json"
+        };
+        Axios.get(Urls.baseUrl + 'payments/current-subscription-plan/', { headers })
+            .then(response => {
+                setLoding(false);
+                console.log("======plans Current", response.data)
+                setuserPlan(response.data);
+
+            }).catch(function (error) {
+                setLoding(false);
+                if (error.response) {
+                    showToast(JSON.stringify(error.response.data) + "", "error")
+                }
+
+            });
+    };
     return (
         <SafeAreaView style={Style.cointainer}>
 
@@ -105,69 +102,45 @@ const Home = ({ navigation, route }) => {
                             onPress={() => { navigation.goBack() }} />
                     </TouchableOpacity>
 
-                    <Text style={[Style.text22, { lineHeight: 25, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack ,textAlignVertical: "center", textAlign: 'center'}]}>Purchase Credit</Text>
+                    <Text style={[Style.text22, { lineHeight: 25, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack, textAlignVertical: "center", textAlign: 'center' }]}>Purchase Credit</Text>
                     <Text style={[Style.text14, { marginVertical: 20, color: Colors.lightblack, justifyContent: 'center', textAlignVertical: "center", textAlign: 'center' }]}>Simple Prices. Serious Value. All plans come with a risk-free 30-day free trial. Get started below!</Text>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={{ flex: 1, }}>
-
+                            <Text style={[Style.text18, { marginLeft: 10, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack }]}>Current Plan</Text>
+                            <View style={styles.currentPlanContainer}>
+                                <View style={{ marginLeft: 5 }}>
+                                    <Text style={[Style.text18, { lineHeight: 25, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack }]}>{userPlan?.package_name}</Text>
+                                    <Text style={[Style.text12, { marginTop: 4 }]}>{userPlan?.description}</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={[Style.text12, { marginTop: 4 }]}>Start date </Text>
+                                        <Text style={[Style.text14, { marginTop: 4, color: Colors.TheamColor3, fontFamily: CustomeFonts.Poppins_Bold, }]}>{userPlan?.start_date}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={[Style.text12, { marginTop: 4 }]}>Expire date </Text>
+                                        <Text style={[Style.text14, { marginTop: 4, color: Colors.red, fontFamily: CustomeFonts.Poppins_Bold, }]}>{userPlan?.end_date}</Text>
+                                    </View>
+                                </View>
+                            </View>
                             {/* <TouchableOpacity
                                 style={{
                                     borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
                                     padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.divider,
                                 }}>
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'ghost'} type={'simple-line-icon'} size={22} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text18, { marginTop: 4 }]}>Day Pass</Text>
-
                                 </View>
-
                                 <Text style={[Style.text12, { marginLeft: 6, marginTop: 4, color: Colors.gray }]}>What You'll Get</Text>
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'checkmark-circle'} type={'ionicon'} size={20} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text14, { marginTop: 4 }]}>8 hours usage of our coworking space</Text>
-
                                 </View>
-
-
                                 <View style={{ flexDirection: 'row', padding: 4, backgroundColor: 'transparent', size: 20 }}>
                                     <Icon name={'checkmark-circle'} type={'ionicon'} size={20} color={Colors.lightblack} style={{ marginRight: 10 }} />
                                     <Text style={[Style.text14, { marginTop: 4 }]}>Access to All our rooms</Text>
-
                                 </View>
-
-
-
                             </TouchableOpacity> */}
-                                <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>Current Plan</Text>
-
-                                <View
-                                        
-                                        style={{
-                                            borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
-                                            padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.lightGreen,
-                                        }}>
-                                         <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>{myPlan.package_name}</Text>
-                                         <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>{myPlan.description}</Text>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>Start date
-                                                    <Text style={[Style.text18, { lineHeight: 24, color: Colors.TheamColor2 }]}> {myPlan.start_date}</Text>
-                                                </Text>
-                                            </View>
-                                            
-                                        </View>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={[Style.text14, { marginTop: 10, marginLeft: 8 }]}>Expire date
-                                                    <Text style={[Style.text18, { lineHeight: 24, color: Colors.red }]}> {myPlan.end_date}</Text>
-                                                </Text>
-                                            </View>
-                                            
-                                        </View>
-                                    </View>
-                                    <Text style={[Style.text18, { marginTop: 40, marginLeft: 8 }]}>Available Plans</Text>
+                            <Text style={[Style.text18, { marginLeft: 10, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack }]}>Available Plans</Text>
 
                             <FlatList
                                 // style={{ borderRadius: 8, backgroundColor: Colors.divider }}
@@ -180,8 +153,8 @@ const Home = ({ navigation, route }) => {
                                             borderWidth: 1, borderColor: Colors.divider, marginTop: 10,
                                             padding: 10, flexDirection: 'column', borderRadius: 8, backgroundColor: Colors.divider,
                                         }}>
-                                        <Text style={[Style.text18, { marginTop: 10, marginLeft: 8 }]}>{item.category}</Text>
 
+                                        <Text style={[Style.text18, { lineHeight: 25, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack }]}>{item?.category}</Text>
                                         <Text style={[Style.text12, { marginLeft: 6, marginTop: 4, color: Colors.gray }]}>{item.description}</Text>
 
                                         <View style={{ flexDirection: 'row' }}>
@@ -219,6 +192,20 @@ const Home = ({ navigation, route }) => {
     );
 };
 
+const styles = StyleSheet.create({
+    currentPlanContainer: {
+        borderColor: Colors.divider,
+        flexDirection: 'column',
+        paddingVertical: 10,
+        backgroundColor: Colors.lightGreen,
+        elevation: 5,
+        margin: 5,
+        paddingVertical: 15,
+        padding: 10,
+        borderRadius: 10
+    },
+});
+
 const Data = [
     {
         iname: 'image',
@@ -250,5 +237,3 @@ const Data = [
 ];
 
 export default Home;
-
-
