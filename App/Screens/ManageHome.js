@@ -3,15 +3,13 @@ import {
     SafeAreaView,
     Text,
     View,
-    Image,
-    FlatList, Platform,
+    FlatList,
     TouchableOpacity,
-    StyleSheet, Alert,
-    Dimensions,
+    Alert,
 } from 'react-native';
 import Colors from '../Theme/Colors';
 import CustomeFonts from '../Theme/CustomeFonts';
-import Style, { HEIGHT } from '../Theme/Style';
+import Style from '../Theme/Style';
 import {
     Menu,
     MenuOptions,
@@ -19,12 +17,8 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 import Icon1 from 'react-native-vector-icons/Ionicons'
-import {
-    validatePhone, validateEmail, validateName, matchPassword,
-    validationempty, validationBlank, validatePassword
-} from '../Common/Validations';
-import { ListItem, Icon } from 'react-native-elements'
-import { LocalData, Params, Urls } from '../Common/Urls';
+import { Icon } from 'react-native-elements'
+import { LocalData, Urls } from '../Common/Urls';
 import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
@@ -189,15 +183,6 @@ const Home = ({ navigation, route }) => {
                                                     <Text style={[Style.text16, { justifyContent: 'center', textAlignVertical: 'center', paddingLeft: 10 }]}>Delete Property</Text>
                                                 </View>
                                             </MenuOption>
-
-                                            <MenuOption value={2} style={{ marginTop: 6 }} onSelect={() => { navigation.navigate('Crewdetail', { pk: item.pk, name: item.name }) }}>
-                                                <View style={{ flexDirection: 'row', }}>
-                                                    <Icon name={'anchor'} type={'font-awesome'} size={20} style={{ width: 25 }} color={Colors.lightblack}
-                                                    />
-                                                    <Text style={[Style.text16, { justifyContent: 'center', textAlignVertical: 'center', paddingLeft: 10 }]}>Manage Crew</Text>
-                                                </View>
-                                            </MenuOption>
-
                                         </MenuOptions>
                                     </Menu> :
 
