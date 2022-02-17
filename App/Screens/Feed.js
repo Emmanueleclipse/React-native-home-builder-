@@ -28,12 +28,12 @@ const Home = ({ navigation, route }) => {
     const isFocused = useIsFocused()
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState([])
-    const [todayUserArray, setTodayUserArray] = useState([])
     const [linkname, setlinkname] = useState('')
     const [isAll, setisAll] = useState(true);
     const [isToday, setisToday] = useState(false);
     const [isEnabled, setIsEnabled] = useState(false);
-    const [onRefresh, setOnRefresh] = useState(false);
+    const [properties, setProperties] = useState(null)
+    const [feedProperty, setFeedProperty] = useState(null)
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
@@ -94,22 +94,28 @@ const Home = ({ navigation, route }) => {
         Axios.get(Urls.baseUrl + 'api/property/', { headers })
             .then(response => {
                 setLoding(false);
-                if (response.data != null) {
+                if (response.data) {
                     let data = []
-                    response.data.map((item, index) => {
-
-                        if (item.activities.length > 0) {
-
-                            var myDate = new Date(item.activities[0]._from);
-                            item.activities[0]._from = myDate.getTime();
-                            data.push(item)
-                        }
-                    })
-                    data.sort(function (a, b) {
-                        return b.activities[0]._from - a.activities[0]._from
-                    })
-                    setTodayUserArray(data.filter(el => Moment(new Date()).format('MMMM DD') === Moment(el.activities[0]._from).format('MMMM DD')));
-                    setuserArray(data);
+                    let properties = []
+                    response.data.map(item => {
+                        properties.push({ name: item.name, address: item.address, pk: item.pk, attachments: item.attachments })
+                        return item.activities.map(item => {
+                            let arrData = {
+                                pk: item.pk,
+                                property: item.property,
+                                milestone_name: item.milestone_name,
+                                description: item.description,
+                                created_at: item.created_at,
+                                from: item._from,
+                                to: item._to,
+                                status: item.status,
+                                attachments: item.attachments
+                            }
+                            return data.push(arrData)
+                            })
+                        })
+                        setuserArray(data)
+                        setProperties(properties)
                 }
 
             }).catch(function (error) {
@@ -118,7 +124,6 @@ const Home = ({ navigation, route }) => {
                     showToast(error.response.data.detail + "", "error")
                 }
             });
-
     };
 
     const ToggleToday = () => {
@@ -133,7 +138,25 @@ const Home = ({ navigation, route }) => {
         apiCall_proprtylist()
     }
 
-    const datalength = () => { return isEnabled ? userArray.length : todayUserArray.length }
+    const loadPropertyDetails = (type, item) => {
+        if(properties){
+            const items =  properties.map(item => item).filter(prop => prop.pk === item)
+            setFeedProperty(items[0])
+            if(type === 'label')return items[0]?.name
+            if(type === 'image') return items[0]?.attachments[0].attachment
+        }
+    }
+
+    const viewDetails = item => {
+        const details = properties.map(item => item).filter(prop => prop.pk === item.property)
+        navigation.navigate('Schedule1', { property: details[0], 'item': item })
+    }
+
+    const datalength = () => { return isEnabled ? userArray.length : todayMilestones.length }
+
+    const milesTones = userArray?.map(item => item).filter(item => item.status !== 'completed')
+    const todayMilestones = userArray?.map(item => item).filter(item => Moment(item.created_at).format('MMMM DD') === Moment().format('MMMM DD'))
+    
     return (
         <SafeAreaView style={Style.cointainer}>
 
@@ -172,91 +195,87 @@ const Home = ({ navigation, route }) => {
                             onRefresh={apiCall_proprtylist}
                             refreshing={isLoding}
                             showsVerticalScrollIndicator={false}
-                            data={isEnabled ? userArray : todayUserArray}
+                            data={isEnabled ? milesTones : todayMilestones}
                             renderItem={({ item, index }) => (
                                 <View style={{ paddingHorizontal: 10, flexDirection: 'column', marginHorizontal: 10, marginVertical: 3, borderRadius: 5, elevation: 5, backgroundColor: 'white' }}>
                                     <View >
                                         <Text style={[Style.text14, { alignSelf: "center", backgroundColor: Colors.TheamColor, color: Colors.black, padding: 8, }]}>
-                                            {Moment(new Date()).format('MMMM DD') === Moment(item.activities[0]._from).format('MMMM DD') ? "Today" : Moment(item.activities[0]._from).format('MMMM DD')}
+                                            {Moment(new Date()).format('MMMM DD') === Moment(item.from).format('MMMM DD') ? "Today" : Moment(item.from).format('MMMM DD')}
                                         </Text>
                                         <View style={{ flexDirection: 'row', marginTop: 5, paddingTop: 10 }}>
                                             <View style={{ flex: 1 }} >
                                                 <Text style={[Style.text16, { justifyContent: 'center', textAlignVertical: 'center', fontFamily: CustomeFonts.Poppins_Bold }]}>
-                                                    {item.name}
+                                                    {item ? loadPropertyDetails('label', item.property): ''}
                                                 </Text>
                                                 <View style={{ flex: 1, paddingVertical: 2 }} >
                                                     <Text style={[Style.text14, { justifyContent: 'center', textAlignVertical: 'center', fontFamily: CustomeFonts.Poppins_Regular }]}>
-                                                        {item.address}
+                                                        {feedProperty?.address}
                                                     </Text>
                                                 </View>
                                             </View>
-                                            <View  >
+                                            <View>
                                                 <Text style={[Style.text16, { justifyContent: 'center', color: Colors.TheamColor2, backgroundColor: Colors.lightGreen, paddingHorizontal: 10, padding: 5, borderRadius: 2, fontFamily: CustomeFonts.Poppins_Regular }]}>
-                                                    {item.activities[0].status}
+                                                    {item.status}
                                                 </Text>
-                                                {item.attachments[0]?.type === 'jpg' || item.attachments[0]?.type === 'jpeg' || item.attachments[0]?.type === 'png' ?
-                                                    <Image
-                                                        resizeMode='cover'
-                                                        style={{ width: 90, height: 70, marginTop: 5 }}
-                                                        source={{ uri: Urls.imageUrl + item.attachments[0].attachment }}
-                                                    // source={require('../assets/images/nodata.png')}
-                                                    /> : null}
+                                                {
+                                                    feedProperty?.attachments[0].type === 'jpg' || feedProperty?.attachments[0].type === 'jpeg' || feedProperty?.attachments[0].type === 'png' ?
+                                                        <Image
+                                                            resizeMode='cover'
+                                                            style={{ width: 90, height: 70, marginTop: 5 }}
+                                                            source={{ uri: Urls.imageUrl + loadPropertyDetails('image', item.property) }}
+                                                        /> 
+                                                    : null
+                                                }
                                             </View>
                                         </View>
                                     </View>
+                                    {
+                                        validationempty(item) ?
+                                            <View>
+                                                <View style={{ flexDirection: 'row', paddingBottom: 6 }}>
 
-                                    {validationempty(item.activities) ?
+                                                    <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center', flexDirection: 'column' }}>
+                                                        <View style={{ flexDirection: 'row', marginTop: 10, }}>
+                                                            <View style={{ flexDirection: 'column', flex: 1 }}>
+                                                                <View style={{ flexDirection: "row", alignItems: "center" }} >
+                                                                    <Text style={[Style.text16, { textDecorationLine: "underline", fontFamily: CustomeFonts.Poppins_SemiBold }]}>Milestone</Text>
+                                                                    <Text style={{ textDecorationLine: "none" }} >{` ${index + 1}`}</Text>
 
+                                                                </View>
 
-                                        <View>
-                                            <View style={{ flexDirection: 'row', paddingBottom: 6 }}>
-
-                                                <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center', flexDirection: 'column' }}>
-                                                    <View style={{ flexDirection: 'row', marginTop: 10, }}>
-                                                        <View style={{ flexDirection: 'column', flex: 1 }}>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }} >
-                                                                <Text style={[Style.text16, { textDecorationLine: "underline", fontFamily: CustomeFonts.Poppins_SemiBold }]}>Milestone</Text>
-                                                                <Text style={{ textDecorationLine: "none" }} > : 1</Text>
-
+                                                                <Text style={[Style.text12, { flex: 2, paddingVertical: 3, fontFamily: CustomeFonts.Poppins_Regular }]}>{item.milestone_name}</Text>
+                                                                <Text numberOfLines={2} style={[Style.text12, { flex: 2, marginVertical: 6, marginTop: 20, color: Colors.gray }]}>{item.description}</Text>
                                                             </View>
+                                                        </View>
 
-                                                            <Text style={[Style.text12, { flex: 2, paddingVertical: 3, fontFamily: CustomeFonts.Poppins_Regular }]}>{item.activities[0].milestone_name}</Text>
-                                                            <Text numberOfLines={2} style={[Style.text12, { flex: 2, marginVertical: 6, marginTop: 20, color: Colors.gray }]}>{item.activities[0].description}</Text>
+
+                                                        <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
+                                                            <TouchableOpacity
+                                                                onPress={() => viewDetails(item)}
+                                                                style={{ flex: 1, height: 40, margin: 3, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: Colors.gray_d1 }}>
+                                                                <Text style={[Style.text14, { textAlignVertical: 'center', textAlign: 'center', color: Colors.black }]}>View Details</Text>
+                                                            </TouchableOpacity>
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    if (LocalData.FLAG == '1') {
+                                                                        navigation.navigate('HomeOwnerReport', { pr_id: item.property, 'item': item, index: index })
+                                                                    }
+                                                                    else {
+                                                                        navigation.navigate('HomeBuilderReport', { pr_id: item.property, 'item': item, index: index, milestoneArray: item })
+                                                                    }
+                                                                }}
+                                                                style={{ flex: 1, height: 40, margin: 3, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: Colors.TheamColor3 }}>
+                                                                <Text style={[Style.text14, { textAlignVertical: 'center', textAlign: 'center', color: Colors.white }]}>View Milestones</Text>
+                                                            </TouchableOpacity>
                                                         </View>
                                                     </View>
-
-
-                                                    <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
-                                                        <TouchableOpacity
-                                                            onPress={() => {
-                                                                navigation.navigate('Schedule1', { pr_id: item.activities[0].pk, 'item': item })
-                                                            }}
-                                                            style={{ flex: 1, height: 40, margin: 3, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: Colors.gray_d1 }}>
-                                                            <Text style={[Style.text14, { textAlignVertical: 'center', textAlign: 'center', color: Colors.black }]}>View Details</Text>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity
-                                                            onPress={() => {
-                                                                if (LocalData.FLAG == '1') {
-                                                                    navigation.navigate('HomeOwnerReport', { pr_id: item.activities[0].property, 'item': item.activities[0], index: index })
-                                                                }
-                                                                else {
-                                                                    navigation.navigate('HomeBuilderReport', { pr_id: item.activities[0].property, 'item': item.activities[0], index: index, milestoneArray: item.activities })
-                                                                }
-                                                            }}
-                                                            style={{ flex: 1, height: 40, margin: 3, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 4, backgroundColor: Colors.TheamColor3 }}>
-                                                            <Text style={[Style.text14, { textAlignVertical: 'center', textAlign: 'center', color: Colors.white }]}>View Milestones</Text>
-                                                        </TouchableOpacity>
-
-
-                                                    </View>
                                                 </View>
+                                                <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View>
                                             </View>
-                                            <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View>
-                                        </View>
-                                        : null}
+                                        : null
+                                    }
                                 </View>
                             )}
-                            keyExtractor={(item, index) => index.toString()}
                             ListEmptyComponent={<NoData itemtext="No activity" />}
                         />}
 
