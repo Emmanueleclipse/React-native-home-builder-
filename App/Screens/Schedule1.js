@@ -28,7 +28,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import nodata from '../assets/images/nodata.png'
 
 const Home = ({ navigation, route }) => {
-    const { pr_id, item } = route.params;
+    const { pr_id, item, property } = route.params;
     const [isLoding, setLoding] = useState(false);
     const [userArray, setuserArray] = useState('')
     const isFocused = useIsFocused()
@@ -44,12 +44,13 @@ const Home = ({ navigation, route }) => {
     },[])
 
     const loadFiles = () => {
-        item.attachments.map(item => setMimeType(item.type))
+        item?.attachments.map(item => setMimeType(item.type))
     }
+
     let data = []
-    const Uploaded = item.activities.map(item => item.attachments.map(item => {
+    const Uploaded = item.attachments.map(item => {
        return data.push({ type: item.type, attachment: item.attachment})
-    }))
+    })
     
     const images = data.map(item => item).filter(item => {
         let file = item.type
@@ -62,7 +63,6 @@ const Home = ({ navigation, route }) => {
     })
 
     let imageArr = []
-    
     const viewImages = images.map(item => {
         return imageArr.push({ url: `${Urls.imageUrl}${item.attachment}`})
     })
@@ -79,9 +79,7 @@ const Home = ({ navigation, route }) => {
     
     return (
         <SafeAreaView style={Style.cointainer}>
-
             <Text style={[Style.text16, { backgroundColor: Colors.divider, fontFamily: CustomeFonts.Poppins_Bold, height: 56, color: Colors.lightblack, justifyContent: 'center', textAlignVertical: "center", textAlign: 'center' }]}>Details</Text>
-
             {isLoding ?
                 <View style={{ alignItems: 'center', }}>
                     <Indicator></Indicator>
@@ -89,32 +87,26 @@ const Home = ({ navigation, route }) => {
                 :
                 <View 
                     style={{ marginTop: 5, padding: 15, borderRadius: 10, margin: 5, elevation: 5, backgroundColor: 'white' }}>
-                    <Text style={[Style.text16, { fontFamily: CustomeFonts.Poppins_Bold, color: Colors.TheamColor3 }]}>{item.name + ""}</Text>
+                    <Text style={[Style.text16, { fontFamily: CustomeFonts.Poppins_Bold, color: Colors.TheamColor3 }]}>{property?.name + ""}</Text>
                     <View style={{ flexDirection: 'row' }} >
-                        <Text onPress={handleClick} style={[Style.text14, { marginTop: 10, flex: 1, }]}>{item.address} , {item.state}</Text>
-                        <Text style={[Style.text12, { marginTop: 10 }]}>{item.activities[0]._from} - {item.activities[0]._to}</Text>
-
-
+                        <Text onPress={handleClick} style={[Style.text14, { marginTop: 10, flex: 1, }]}>{property?.address} , {item?.state}</Text>
+                        <Text style={[Style.text12, { marginTop: 10 }]}>{item.from} - {item.to}</Text>
                     </View>
                     <View style={{ marginTop: 5, height: 1, width: '100%', backgroundColor: Colors.divider }}></View>
                     <TouchableOpacity onPress={() => setshowDes(!showDes)} style={{ flexDirection: "row", paddingVertical: 5 }}  >
                         <Text style={[Style.text16, { flex: 1, marginTop: 10, color: Colors.TheamColor3, fontFamily: CustomeFonts.Poppins_Medium }]}>Description</Text>
                         <Icon name={!showDes ? 'chevron-down' : 'chevron-up'} type={'material-community'} color={Colors.TheamColor2} size={35} style={{ width: 40, justifyContent: 'flex-start' }} />
                     </TouchableOpacity>
-                    {
-                        showDes ?
-                            <Text style={[Style.text14]}>{item.activities[0].description}</Text>
-                            : null
-                    }
+
+                    { showDes ? <Text style={[Style.text14]}>{item.description}</Text> : null }
+
                     <TouchableOpacity onPress={() => setshowImage(!showimage)} style={{ flexDirection: "row", paddingVertical: 5 }}  >
                         <Text style={[Style.text16, { flex: 1, marginTop: 10, color: Colors.TheamColor3, fontFamily: CustomeFonts.Poppins_Medium }]}>Images/Video</Text>
                         <Icon name={!showimage ? 'chevron-down' : 'chevron-up'} type={'material-community'} color={Colors.TheamColor2} size={35} style={{ width: 40, justifyContent: 'flex-start' }} />
                     </TouchableOpacity>
                     {
                         showimage ?
-
                             images !== null  ?
-
                                 <FlatList
                                     data={images}
                                     horizontal
@@ -129,13 +121,11 @@ const Home = ({ navigation, route }) => {
                                                 />
                                         </TouchableOpacity>
                                     )}
-        
                                 />
                                 :
                                 <Text style={[Style.text14, { textAlign: 'center', marginVertical: 10 }]}>Data Not Found</Text>
                             :
                             null
-
                     }
                     <TouchableOpacity onPress={() => setshowpdf(!showpdf)} style={{ flexDirection: "row", paddingVertical: 5 }}  >
                         <Text style={[Style.text16, { flex: 1, marginTop: 10, color: Colors.TheamColor3, fontFamily: CustomeFonts.Poppins_Medium }]}>Pdf, doc, csv</Text>
@@ -164,7 +154,6 @@ const Home = ({ navigation, route }) => {
                             : null
                     }
                 </View>
-
             }
             {
                 zoomImage ?
