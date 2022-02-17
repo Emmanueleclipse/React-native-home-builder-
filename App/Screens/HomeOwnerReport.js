@@ -3,21 +3,13 @@ import {
     SafeAreaView,
     Text,
     View,
-    Image,
-    FlatList, Platform,
+    FlatList, 
     TouchableOpacity,
-    StyleSheet,
-    Dimensions,
 } from 'react-native';
 import Colors from '../Theme/Colors';
-import CustomeFonts from '../Theme/CustomeFonts';
-import Style, { HEIGHT, WIDTH } from '../Theme/Style';
-import { Icon } from 'react-native-elements';
-import {
-    validatePhone, validateEmail, validateName, matchPassword,
-    validationempty, validationBlank, validatePassword
-} from '../Common/Validations';
-import { LocalData, Params, Urls } from '../Common/Urls';
+import Style from '../Theme/Style';
+import { validationempty } from '../Common/Validations';
+import { Urls } from '../Common/Urls';
 import { Indicator, showToast, NoData } from '../Common/CommonMethods';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios'
