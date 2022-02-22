@@ -80,7 +80,7 @@ const Home = ({ navigation, route }) => {
         getToken()
         setlinkname('')
         apiCall_proprtylist()
-    }, [linkname]);
+    }, []);
 
     const apiCall_proprtylist = async () => {
         var access = await AsyncStorage.getItem('access')
@@ -152,10 +152,10 @@ const Home = ({ navigation, route }) => {
         navigation.navigate('Schedule1', { property: details[0], 'item': item })
     }
 
-    const datalength = () => { return isEnabled ? userArray.length : todayMilestones.length }
+    const datalength = () => { return isEnabled ? milesTones.length : todayMilestones.length }
 
-    const milesTones = userArray?.map(item => item).filter(item => item.status !== 'completed')
-    const todayMilestones = userArray?.map(item => item).filter(item => Moment(item.created_at).format('MMMM DD') === Moment().format('MMMM DD'))
+    const milesTones = userArray?.map(item => item).filter(item => item.status !== 'completed' )
+    const todayMilestones = userArray?.map(item => item).filter(item => Moment(item.from).format('MMMM DD') === Moment().format('MMMM DD') && item.status !== 'completed')
     
     return (
         <SafeAreaView style={Style.cointainer}>
