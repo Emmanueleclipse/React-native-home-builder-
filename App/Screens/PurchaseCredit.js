@@ -102,7 +102,7 @@ const Home = ({ navigation, route }) => {
                             onPress={() => { navigation.goBack() }} />
                     </TouchableOpacity>
 
-                    <Text style={[Style.text22, { lineHeight: 25, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack, textAlignVertical: "center", textAlign: 'center' }]}>Purchase Credit</Text>
+                    <Text style={[Style.text22, { lineHeight: 25, marginTop: 20, fontFamily: CustomeFonts.Poppins_Bold, color: Colors.lightblack, textAlignVertical: "center", textAlign: 'center' }]}>Payment and Billing</Text>
                     <Text style={[Style.text14, { marginVertical: 20, color: Colors.lightblack, justifyContent: 'center', textAlignVertical: "center", textAlign: 'center' }]}>Simple Prices. Serious Value. All plans come with a risk-free 30-day free trial. Get started below!</Text>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={{ flex: 1, }}>
