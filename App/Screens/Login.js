@@ -101,7 +101,7 @@ const Login = ({ navigation, route }) => {
                     <View >
                         <Text style={[Style.text22, { lineHeight: 25, fontFamily: CustomeFonts.Poppins_Bold, marginBottom: 30, color: Colors.lightblack, justifyContent: 'center', textAlignVertical: "center", textAlign: 'center' }]}>Log in</Text>
 
-                        <Text style={[Style.text14, { marginTop: 10, color: Colors.lightblack, }]}>Email or UserName</Text>
+                        <Text style={[Style.text14, { marginTop: 10, color: Colors.lightblack, }]}>Email</Text>
 
                         <TextInput style={[Style.textInput, { marginTop: 0 }]}
                             onChangeText={(text) => setUserName(text)}
