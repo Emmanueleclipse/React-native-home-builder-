@@ -66,10 +66,10 @@ const App = ({ navigation, route }) => {
 
         if (selected == "1") {
             if (
-                validationBlank(cardname, "Enter CardHolder Name") &&
-                validationBlank(cardnumber, "Enter CardNumber") &&
-                validationBlank(cvcnum, "Enter CVC NUmber") &&
-                validationBlank(fullname, "Enter Fullname") &&
+                validationBlank(cardname, "Enter Card Holder Name") &&
+                validationBlank(cardnumber, "Enter Card Number") &&
+                validationBlank(cvcnum, "Enter CVC Number") &&
+                validationBlank(fullname, "Enter Full Name") &&
                 validationBlank(billaddress, "Enter Adress") &&
                 validationBlank(country, "Select Country")
 
